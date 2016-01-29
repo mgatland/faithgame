@@ -99,7 +99,7 @@ function redraw(){
 
     var w = mainCanvasCtx.width;
     var h = mainCanvasCtx.height;
-    var wd = w/160.0;
+    var wd = w/100.0;
     var hd = h/100.0;
     zoom=1;
     if (wd<hd){
@@ -110,11 +110,11 @@ function redraw(){
     if(zoom<1){
       zoom=1;
     }
-    var dx=(w-160*zoom)/2;
+    var dx=(w-100*zoom)/2;
     var dy=(h-100*zoom)/2;
     mainCanvasCtx.fillStyle="#000000";
     mainCanvasCtx.fillRect(0,0,w,h);
-    mainCanvasCtx.drawImage(images[currentIndex],0,0,160,100,dx,dy,160*zoom,100*zoom);
+    mainCanvasCtx.drawImage(images[currentIndex],0,0,100,100,dx,dy,100*zoom,100*zoom);
   } else {    
     mainCanvasCtx.fillStyle="#ff0000";
     mainCanvasCtx.fillRect(0,0,mainCanvas.width/2,mainCanvas.height/2);
@@ -158,7 +158,7 @@ function redraw(){
 
     var w = mainCanvasCtx.width;
     var h = mainCanvasCtx.height;
-    var wd = w/160.0;
+    var wd = w/100.0;
     var hd = h/100.0;
     zoom=1;
     if (wd<hd){
@@ -169,14 +169,14 @@ function redraw(){
     if(zoom<1){
       zoom=1;
     }
-    var dx=(w-160*zoom)/2;
+    var dx=(w-100*zoom)/2;
     var dy=(h-100*zoom)/2;
 
     var x=Math.floor((coords[0]-dx)/zoom);
     var y=Math.floor((coords[1]-dy)/zoom);
     target=0;
-    if(x>=0&&x<160&&y>=0&&y<100) {
-      var ch = gameState.imageDats[currentIndex][x+160*y];
+    if(x>=0&&x<100&&y>=0&&y<100) {
+      var ch = gameState.imageDats[currentIndex][x+100*y];
       var colIndex = parseInt(ch,16);
       target=gameState.hyperlinks[currentIndex][colIndex];
 
@@ -337,15 +337,15 @@ function renderImages(){
 
   for (var i=0;i<16;i++){
     var canvas = document.createElement('canvas');
-    canvas.width="160";
+    canvas.width="100";
     canvas.height="100";
     var ctx=canvas.getContext("2d");
 
     var descriptionArray = gameState.canvasses[i];
     var descriptionString = RLE_decode(descriptionArray);
     for (var j=0;j<descriptionString.length;j++){
-      var x = j%160;
-      var y = Math.floor(j/160);
+      var x = j%100;
+      var y = Math.floor(j/100);
       var ch=descriptionString[j];
       var colIndex = parseInt(ch,16);
       ctx.fillStyle=colorPalette[colIndex];
