@@ -66,6 +66,30 @@ var get_blob = function() {
     return self.Blob;
 }
 
+var timer = 600;
+
+var getTwoDigitNum = function (num) {
+  if (num >= 10) return num;
+  return "0" + num;
+}
+
+var getDigitalTime = function (num) {
+  if (num < 60)
+  {
+    return "0:" + getTwoDigitNum(num);
+  } else {
+    return Math.floor(num/60) + ":" + getTwoDigitNum(num % 60);
+  }
+}
+
+var advanceTimer = function() {
+  timer--;
+  document.getElementById("timer").innerHTML = getDigitalTime(timer);
+}
+setInterval(function () {
+  advanceTimer();
+}, 1000);
+
 function buildStandalone(sourceCode) {
   if (standalone_HTML_String.length===0) {
     alert("Can't export yet - still downloading html template.",true);
@@ -802,6 +826,13 @@ function clearPalette(){
 #maincanvas {
   cursor:crosshair;
 }
+
+#timer {
+  font-size: 30px;
+  padding: 4px;
+  color:white;
+}
+
 body {
     -webkit-user-select: none; /* webkit (safari, chrome) browsers */
     -moz-user-select: none; /* mozilla browsers */
@@ -910,6 +941,7 @@ body {
     <table cellpadding="10">
       <tr>
         <td>
+          <div id="timer"></div>
           <ul>
             <li> 
               <a class="layerItem selectedItem" id="layerItem1" href="#" onclick="setLayer(1);return false;">
