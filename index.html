@@ -305,9 +305,9 @@ function press(evt){
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
-  var width=128;
-  var height=128;
-  var zoomFactor=4;
+  var width=100;
+  var height=100;
+  var zoomFactor=6;
   var radius=5;
 
   var visibleCanvas;
@@ -728,7 +728,7 @@ function clearPalette(){
       for (var i=0;i<points.length;i++){
         var px=points[i][0];
         var py=points[i][1];
-        if (px>=0&&px<160&&py>=0&&py<100){
+        if (px>=0&&px<100&&py>=0&&py<100){
           canvas[px+width*py]=colorIndex;
         }
       }
@@ -744,7 +744,7 @@ function clearPalette(){
       for (var i=0;i<points.length;i++){
         var px=points[i][0];
         var py=points[i][1];
-        if (px>=0&&px<160&&py>=0&&py<100){
+        if (px>=0&&px<100&&py>=0&&py<100){
           canvas[px+width*py]=colorIndex;
         }
       }
@@ -973,7 +973,7 @@ body {
                       <center>
                         <input width="640" style="border:2px solid gray;" onkeydown="event.stopPropagation();" value="www.flickgame.org"  id="linkInput" oninput="linkChange(this.value)" />
                         <br/>
-                        <canvas id="mainCanvas" width="512" height="512" style="border:2px solid gray; background-color:black;"></canvas>
+                        <canvas id="mainCanvas" width="600" height="600" style="border:2px solid gray; background-color:black;"></canvas>
                         <br />
                         <table style="border:2px solid gray; margin-top:2px" margin="0">
                           <tr height="16">
