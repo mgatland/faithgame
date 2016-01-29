@@ -305,8 +305,8 @@ function press(evt){
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
-  var width=160;
-  var height=100;
+  var width=128;
+  var height=128;
   var zoomFactor=4;
   var radius=5;
 
@@ -973,7 +973,7 @@ body {
                       <center>
                         <input width="640" style="border:2px solid gray;" onkeydown="event.stopPropagation();" value="www.flickgame.org"  id="linkInput" oninput="linkChange(this.value)" />
                         <br/>
-                        <canvas id="mainCanvas" width="640" height="400" style="border:2px solid gray; background-color:black;"></canvas>
+                        <canvas id="mainCanvas" width="512" height="512" style="border:2px solid gray; background-color:black;"></canvas>
                         <br />
                         <table style="border:2px solid gray; margin-top:2px" margin="0">
                           <tr height="16">
