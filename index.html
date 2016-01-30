@@ -882,6 +882,18 @@ function clearPalette(){
   height: 60px;
 }
 
+#shareButton {
+  font-size:20px;
+  border: 1px solid white;
+  padding: 5px;
+  margin:10px;
+  display: inline-block;
+  text-decoration: none;
+}
+#shareButton:hover {
+  background-color: grey
+}
+
 body {
     -webkit-user-select: none; /* webkit (safari, chrome) browsers */
     -moz-user-select: none; /* mozilla browsers */
@@ -1212,15 +1224,16 @@ body {
                             </td>                           
                           </tr>
                         </table>
+                      <a href="#" onclick="shareClick();return false;" id="shareButton">&ocir; it is done</a><br />
+                      <div id="shareLink"></div>
+                      <a href="#" onclick="exportClick();return false;">&sdotb; export</a><br />
+                      <input type="file" accept=".html" id="my_file" style="display: none;" />
                       </center>
                     </td>
                     <td valign="top">
-                      <a href="#" onclick="shareClick();return false;">&ocir; share</a><br />
-                      <div id="shareLink"></div>
-                      <a href="#" onclick="exportClick();return false;">&sdotb; export</a><br />
-                      <a href="#" onclick="document.getElementById('my_file').click();return false;">&sdotb; import</a><br />
-                      <input type="file" accept=".html" id="my_file" style="display: none;" />
-                      <a href="help.html" target="_blank" title="blah">? help</a>
+                      <br />
+                      <br />
+                      <br />
                       <br />
                       <br />
                       <a href="#" onclick="setRadius(16);return false;"><img src="16.png" class="radius" id="radius_16" /></a>
