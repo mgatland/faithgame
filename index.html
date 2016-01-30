@@ -548,17 +548,26 @@ function clearPalette(){
     function drawThumbnail(n){
       thumbCtx=thumbnailContext[n];
       thumbCtx.fillStyle="#FF0000";
-      thumbCtx.fillRect(0,0,16,10);
+      thumbCtx.fillRect(0,0,10,10);
+      //thumbCtx.imageSmoothingEnabled = false;
+      //thumbCtx.mozImageSmoothingEnabled = false;
+      //thumbCtx.oImageSmoothingEnabled = false;
+      //thumbCtx.webkitImageSmoothingEnabled = false;
+      //thumbCtx.msImageSmoothingEnabled = false;
       var canvas=canvasses[n];
-      for (var i=0;i<16;i++){
+      for (var i=0;i<10;i++){
         for (var j=0;j<10;j++){
-          var max=0;
+          var count=new Uint8Array(4);
           for (var i2=0;i2<10;i2++){              
             for (var j2=0;j2<10;j2++){
                 var sample = canvas[i*10+i2+width*(j*10+j2)];
-                if (sample>max){
-                  max=sample;
-                }
+                ++count[sample];
+            }
+          }
+          var max=0;
+          for (var countIndex=0; countIndex<4; ++countIndex) {
+            if (count[countIndex] > count[max]) {
+              max = countIndex;
             }
           }
           thumbCtx.fillStyle=colorPalette[max];
@@ -566,8 +575,8 @@ function clearPalette(){
         }
       }
 
-//      var dataUrl = thumbnailCanvas[n].toDataURL();
-//      "dropdownOption"[0][0].style.backgroundImage="url("+dataUrl+")";
+      //var dataUrl = thumbnailCanvas[n].toDataURL();
+      //dropdownOption[0][1].style.backgroundImage="url("+dataUrl+")";
     }
 
     function setVisuals(genAllThumbnails){
@@ -945,52 +954,52 @@ body {
           <ul>
             <li> 
               <a class="layerItem selectedItem" id="layerItem1" href="#" onclick="setLayer(1);return false;">
-              <canvas id="thumbnail1" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail1" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               1</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem2" href="#" onclick="setLayer(2);return false;">
-              <canvas id="thumbnail2" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail2" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               2</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem3" href="#" onclick="setLayer(3);return false;">
-              <canvas id="thumbnail3" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail3" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               3</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem4" href="#" onclick="setLayer(4);return false;">
-              <canvas id="thumbnail4" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail4" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               4</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem5" href="#" onclick="setLayer(5);return false;">
-              <canvas id="thumbnail5" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail5" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               5</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem6" href="#" onclick="setLayer(6);return false;">
-              <canvas id="thumbnail6" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail6" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               6</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem7" href="#" onclick="setLayer(7);return false;">
-              <canvas id="thumbnail7" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail7" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               7</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem8" href="#" onclick="setLayer(8);return false;">
-              <canvas id="thumbnail8" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail8" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               8</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem9" href="#" onclick="setLayer(9);return false;">
-              <canvas id="thumbnail9" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail9" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               9</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem10" href="#" onclick="setLayer(10);return false;">
-              <canvas id="thumbnail10" width="16" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail10" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               10</a>
             </li>
           </ul>
