@@ -238,7 +238,7 @@ function stateToString(){
   var state = new Object();
   state.gameLink=gameLink;
   state.canvasses=new Array();
-  for (var i=0;i<16;i++){
+  for (var i=0;i<10;i++){
     var canvas=canvasses[i];
     var s="";
     for (var j=0;j<width*height;j++){
@@ -584,22 +584,25 @@ function clearPalette(){
       //thumbCtx.webkitImageSmoothingEnabled = false;
       //thumbCtx.msImageSmoothingEnabled = false;
       var canvas=canvasses[n];
+      var colorUsageCount=[];
       for (var i=0;i<10;i++){
         for (var j=0;j<10;j++){
-          var count=new Uint8Array(4);
+          for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
+            colorUsageCount[countIndex]=0;
+          }
           for (var i2=0;i2<10;i2++){              
             for (var j2=0;j2<10;j2++){
                 var sample = canvas[i*10+i2+width*(j*10+j2)];
-                ++count[sample];
+                ++colorUsageCount[sample];
             }
           }
-          var max=0;
-          for (var countIndex=0; countIndex<4; ++countIndex) {
-            if (count[countIndex] > count[max]) {
-              max = countIndex;
+          var majorityColorIndex=0;
+          for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
+            if (colorUsageCount[countIndex] > colorUsageCount[majorityColorIndex]) {
+              majorityColorIndex = countIndex;
             }
           }
-          thumbCtx.fillStyle=colorPalette[max];
+          thumbCtx.fillStyle=colorPalette[majorityColorIndex];
           thumbCtx.fillRect(i,j,1,1);          
         }
       }
@@ -612,13 +615,25 @@ function clearPalette(){
       //visibleContext.drawImage(canvasses[canvasIndex], 0, 0); 
       //visibleContext.drawImage(canvasses[canvasIndex], 0, 0,width*zoomFactor,height*zoomFactor); 
       canvas=canvasses[canvasIndex];
+      var colorUsageCount=[];
+      for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
+        colorUsageCount[countIndex]=0;
+      }
       for (var i=0;i<width;i++){
         for (var j=0;j<height;j++){
           var pixelIndex = canvas[i+width*j]; 
           visibleContext.fillStyle=colorPalette[pixelIndex];
-          visibleContext.fillRect(i*zoomFactor,j*zoomFactor,zoomFactor,zoomFactor);        
+          visibleContext.fillRect(i*zoomFactor,j*zoomFactor,zoomFactor,zoomFactor);
+          ++colorUsageCount[pixelIndex];
         }
       }
+      // var majorityColorIndex=0;
+      // for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
+      //   if (colorUsageCount[countIndex] > colorUsageCount[majorityColorIndex]) {
+      //     majorityColorIndex = countIndex;
+      //   }
+      // }
+      // document.body.style.backgroundColor = colorPalette[majorityColorIndex];
       if (genAllThumbnails===true){
         for (var i=0;i<16;i++){
           drawThumbnail(i);          
@@ -869,9 +884,10 @@ function clearPalette(){
 }
 
 #timer {
-  font-size: 30px;
+  font-size: 22px;
   padding: 4px;
   color:white;
+  text-shadow: 1px 1px #000000;
 }
 
 #message {
