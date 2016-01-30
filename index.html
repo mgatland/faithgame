@@ -18,6 +18,7 @@
   var finished = false;
   var hasBeenOpened = [];
   hasBeenOpened[0] = true;
+  var frameData = new Array();
 
   var shareLinkInner=null;
 
@@ -93,7 +94,7 @@ var get_blob = function() {
 var timers = [];
 for (var i = 0; i < numFrames; i++)
 {
-  timers[i] = 60 * 2;
+  timers[i] = 60.0 * 2.0;
 }
 
 var getTwoDigitNum = function (num) {
@@ -102,6 +103,7 @@ var getTwoDigitNum = function (num) {
 }
 
 var getDigitalTime = function (num) {
+  num=Math.round(num);
   if (num <= 0)
   {
     return "0:00";
@@ -114,21 +116,55 @@ var getDigitalTime = function (num) {
   }
 }
 
+function lerp(colorA, colorB, t) {
+  var result=colorB*t + colorA*(1.0-t);
+  return result;
+}
+
+function toHexColor(r,g,b) {
+  return "#"+Math.round(r).toString(16)+Math.round(g).toString(16)+Math.round(b).toString(16);
+}
+
+var ticksPerSecond=10;
+var timerInterval=1000/ticksPerSecond;
+var secondsPerMilisecond=1.0/1000.0;
+
 var updateTimeDisplay = function() {
   for (var timerIndex=0; timerIndex<numFrames; ++timerIndex) {
     document.getElementById("thumbTimer"+(timerIndex+1)).innerHTML = getDigitalTime(timers[timerIndex]);
   }
+  var lerpStage=10;
+  var timeRemainingThisCanvas=timers[canvasIndex];
+  var timerIntervalSeconds=timerInterval*secondsPerMilisecond;
+  var flashColorValue=64;
+  if (timeRemainingThisCanvas<timerIntervalSeconds) {
+    document.body.style.backgroundColor=toHexColor(flashColorValue,flashColorValue,flashColorValue);
+  } else if (timeRemainingThisCanvas < lerpStage+0.5) {
+    var timeRemainingFraction=timeRemainingThisCanvas/lerpStage;
+    // var colorValue=lerp(255, 0, timeRemainingFraction);
+    // var newBG="#"+Math.round(colorValue).toString(16)+"0000";
+    var subSeconds=(timeRemainingThisCanvas+0.5-Math.floor(timeRemainingThisCanvas+0.5));
+    var colorValue=(Math.sin(subSeconds*Math.PI)+1)*flashColorValue*0.5;
+    var newBG=toHexColor(colorValue,colorValue,colorValue);
+    document.body.style.backgroundColor=newBG;
+  } else {
+    document.body.style.backgroundColor="";
+  }
 }
 
 var advanceTimer = function() {
-  if (begun && timers[canvasIndex] > 0) {
-    timers[canvasIndex]--;
+  if (begun) {
+    if (timers[canvasIndex] > 0) {
+      timers[canvasIndex]-=timerInterval*secondsPerMilisecond;
+    } else {
+      timers[canvasIndex]=0;
+    }
   }
   updateTimeDisplay();
 }
 setInterval(function () {
   advanceTimer();
-}, 1000);
+}, timerInterval);
 
 function buildStandalone(sourceCode) {
   if (standalone_HTML_String.length===0) {
@@ -805,9 +841,63 @@ function clearPalette(){
     
   }
 
+  function clamp(value,min,max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function drawCircleOfAnySize(canvas, x0, y0, radius, colorIndex){
+    var x = radius;
+    var y = 0;
+    var decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
+    var makePixelIndexer = function(){
+      return function(i,j){
+        var index = j*width + i;
+        //index points to the R chanel of pixel 
+        //at column i and row j calculated from top left
+        return index;
+      };
+    }
+    var pixelIndexer = makePixelIndexer(width);
+    var drawPixel = function(x,y){
+       var idx = pixelIndexer(x,y);
+       canvas[idx] = colorIndex;  //red
+    };
+    var drawRow = function(xL,xR,y){
+      var idxL = Math.max(pixelIndexer(xL,y), y*width);
+      var idxR = Math.min(pixelIndexer(xR,y), (y+1)*width);
+      for (;idxL < idxR; ++idxL) {
+        canvas[idxL] = colorIndex;
+      }
+    };
+    while(x >= y){
+      drawRow(x0 - x, x0 + x, y0 + y); // a
+      drawRow(x0 - y, x0 + y, y0 + x); // b
+      drawRow(x0 - x, x0 + x, y0 - y); // c
+      drawRow(x0 - y, x0 + y, y0 - x); // b
+      // drawPixel( x + x0,  y + y0); a
+      // drawPixel( y + x0,  x + y0); b
+      // drawPixel(-x + x0,  y + y0); a
+      // drawPixel(-y + x0,  x + y0); b
+      // drawPixel(-x + x0, -y + y0); c
+      // drawPixel(-y + x0, -x + y0); d
+      // drawPixel( x + x0, -y + y0); c
+      // drawPixel( y + x0, -x + y0); d
+      y++;
+      if (decisionOver2<=0){
+        decisionOver2 += 2 * y + 1;   // Change in decision criterion for y -> y+1
+      }else{
+        x--;
+        decisionOver2 += 2 * (y - x) + 1;   // Change for y -> y+1, x -> x-1
+      }
+    }
+  }
+
   function drawCircle(canvas,x,y,radius,colorIndex){  
     radius=Math.floor(radius/2)+1;
-    if (radius==2){
+    if (radius==1){
+      canvas[x+width*y]=colorIndex;
+      return;
+    } else if (radius==2){
       var points = [[x,y],[x-1,y],[x,y+1],[x+1,y],[x,y-1]];
       for (var i=0;i<points.length;i++){
         var px=points[i][0];
@@ -835,6 +925,9 @@ function clearPalette(){
       return;
 
     }
+
+    drawCircleOfAnySize(canvas, x, y, radius, colorIndex);
+    return;
 
     for (var i=Math.max(x-radius,0);i<=Math.min(x+radius,width-1);i++){
       for (var j=Math.max(y-radius,0);j<=Math.min(y+radius,height-1);j++){
