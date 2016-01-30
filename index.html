@@ -114,6 +114,7 @@ function buildStandalone(sourceCode) {
 
   htmlString = "<!--Save as html file-->\n"+htmlString;
   htmlString = htmlString.replace(/__EMBED__/g,sourceCode);
+  htmlString = htmlString.replace(/"__COLORPALETTE__"/g, "[\"" + colorPalette.join("\",\"") + "\"]");
 
   var BB = get_blob();
   var blob = new BB([htmlString], {type: "text/plain;charset=utf-8"});
@@ -231,6 +232,7 @@ function stateToString(){
     state.canvasses.push(pairs);
   }
   state.hyperlinks=hyperlinks;
+  state.colorPalette = colorPalette;
   var result=JSON.stringify(state);
   return result;
 }
