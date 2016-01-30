@@ -15,6 +15,7 @@
   var numColors = 4;
   var thumbSize = 20;
   var begun = false;
+  var finished = false;
   var hasBeenOpened = [];
   hasBeenOpened[0] = true;
 
@@ -168,11 +169,29 @@ function shareClick() {
   var str = stateToString();
   var request = new XMLHttpRequest();
   request.onreadystatechange = function() { 
-          window.location = "/gallery.html";
-      }
+    if (request.readyState !== XMLHttpRequest.DONE) {
+        return;
+    }
+    if (request.status !== 200) {
+        return;
+    }
+    window.location = request.responseText;
+  }
   request.open('POST', '/newgame', true);
   request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   request.send("file=" + str);
+
+  //prevent multiple submissions
+  var button = document.getElementById("shareButton");
+  button.onclick = "";
+  button.className += " disabled";
+  finished = true;
+  document.getElementById("brushes").className += " hidden";
+
+  var elems = document.querySelectorAll('select');
+  for (var i = 0; i < elems.length; i++) {
+      elems[i].setAttribute('disabled', "true");
+  }
 }
 
 function RLE_encode(input) {
@@ -675,7 +694,7 @@ function clearPalette(){
 
   function mouseDown(e){
 
-    if (timers[canvasIndex] <= 0) return;
+    if (timers[canvasIndex] <= 0 || finished) return;
     e = e || window.event;
 
     drawing=1;
@@ -894,6 +913,19 @@ function clearPalette(){
 
 .button:hover {
   background-color: grey
+}
+
+.button.disabled:hover {
+  background-color: inherit;
+}
+
+.button.disabled {
+  color: grey;
+  border-color: grey;
+}
+
+.hidden {
+  display: none;
 }
 
 #instructions {
@@ -1268,7 +1300,7 @@ body {
                       <input type="file" accept=".html" id="my_file" style="display: none;" />
                       </center>
                     </td>
-                    <td valign="top">
+                    <td valign="top" id="brushes">
                       <br />
                       <br />
                       <br />

@@ -4,7 +4,7 @@ process.title = 'faithgame';
 var express = require("express");
 var bodyParser = require('body-parser')
 var app = express();
-var port = process.env.PORT || 80;
+var port = process.env.PORT || 8080;
 
 var games = [];
 
@@ -18,7 +18,7 @@ app.post('/newgame', function(req, res){
     var data = JSON.parse(req.body.file);
     games[games.length] = data
     saveToDatabase(data);
-    res.send('ok');
+    res.send('/play.html?p=' + (games.length - 1));
 });
 
 app.post("/remove", function(req, res) {
