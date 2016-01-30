@@ -15,6 +15,8 @@
   var numColors = 4;
   var thumbSize = 20;
   var begun = false;
+  var hasBeenOpened = [];
+  hasBeenOpened[0] = true;
 
   var shareLinkInner=null;
 
@@ -378,8 +380,17 @@ function clearPalette(){
         colorElem[colorIndex].setAttribute("class","selected");
     }
 
+    function numberOfPagesOpened() {
+      var count = 0;
+      for (var i = 0; i < numFrames; i++) {
+        if (hasBeenOpened[i] == true) count++;
+      }
+      return count;
+    }
+
     function setLayer(newCanvasIndex) {
       document.getElementById("message").innerHTML = messages[newCanvasIndex - 1];
+      hasBeenOpened[newCanvasIndex - 1] = true;
       canvasIndex=newCanvasIndex-1;
         for(var i=0;i<numFrames;i++){
           if (layerElem[i]!==null){
@@ -392,6 +403,9 @@ function clearPalette(){
           dropdownOption[i].value=hyperlinks[canvasIndex][i];
         }
         updateTimeDisplay();
+        if (numberOfPagesOpened() >= 9) {
+          document.getElementById("shareButton").style.display = "";
+        }
     }
 
     function init() {
@@ -1243,7 +1257,7 @@ body {
                             </td>                           
                           </tr>
                         </table>
-                      <a href="#" onclick="shareClick();return false;" class="button" id="shareButton">&ocir; it is done</a><br />
+                      <a href="#" onclick="shareClick();return false;" style="display:none" class="button" id="shareButton">&ocir; it is done</a><br />
                       <div id="shareLink"></div>
                       <!--
                       <a href="#" onclick="exportClick();return false;">&sdotb; export</a><br />
