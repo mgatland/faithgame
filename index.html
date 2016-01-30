@@ -162,6 +162,10 @@ function importClick(){
   reader.readAsText(file, encoding);
 }
 function shareClick() {
+  if (window.location.hostname.indexOf("heroku") == -1) {
+    exportClick();
+    return;
+  }
   var str = stateToString();
   var request = new XMLHttpRequest();
   request.onreadystatechange = function() { 
