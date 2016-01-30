@@ -16,8 +16,6 @@
   var thumbSize = 20;
   var begun = false;
   var finished = false;
-  var hasBeenOpened = [];
-  hasBeenOpened[0] = true;
   var frameData = new Array();
 
   var shareLinkInner=null;
@@ -441,14 +439,64 @@ function clearPalette(){
     function numberOfPagesOpened() {
       var count = 0;
       for (var i = 0; i < numFrames; i++) {
-        if (hasBeenOpened[i] == true) count++;
+        if (frameData[i].hasBeenOpened == true) count++;
       }
       return count;
     }
 
+    function downsample(canvas, compareBlockCount, downsampledResult) {
+      var widthInPixels = width/compareBlockCount;
+      var heightInPixels = height/compareBlockCount;
+
+      var colorUsageCount=[];
+      for (var j=0;j<compareBlockCount;j++){
+        for (var i=0;i<compareBlockCount;i++){
+          for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
+            colorUsageCount[countIndex]=0;
+          }
+          for (var subj=0;subj<heightInPixels;subj++){
+            for (var subi=0;subi<widthInPixels;subi++){
+              var sample = canvas[i*widthInPixels+subi+width*(j*heightInPixels+subj)];
+              ++colorUsageCount[sample];
+            }
+          }
+          var majorityColorIndex=0;
+          for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
+            if (colorUsageCount[countIndex] > colorUsageCount[majorityColorIndex]) {
+              majorityColorIndex = countIndex;
+            }
+          }
+          downsampledResult[i+j*widthInPixels]=majorityColorIndex;      
+        }
+      }
+    }
+
+    function compareCanvasses(canvasA, canvasB) {
+      var similarity=0;
+      var compareBlockCount=10;
+      var compareCanvasA = new Uint8Array(compareBlockCount*compareBlockCount);
+      var compareCanvasB = new Uint8Array(compareBlockCount*compareBlockCount);
+      downsample(canvasA, compareBlockCount, compareCanvasA);
+      downsample(canvasB, compareBlockCount, compareCanvasB);
+      for (var i=0; i<compareCanvasA.length; ++i) {
+        if (compareCanvasA[i] == compareCanvasB[i])
+          ++similarity;
+      }
+      similarity /= compareBlockCount*compareBlockCount;
+      return similarity;
+    }
+
+    function updateReflection() {
+      document.getElementById("strokesCountReflection").innerHTML = frameData[canvasIndex].strokesCount + " strokes";
+      document.getElementById("fillsCountReflection").innerHTML = frameData[canvasIndex].fillsCount + " fills";
+      document.getElementById("hasBeenOpenedReflection").innerHTML = frameData[canvasIndex].hasBeenOpened ? "this frame has been viewed" : "this frame has not been viewed";
+      var similarity=compareCanvasses(canvasses[2], canvasses[5]);
+      document.getElementById("frameSixReflection").innerHTML = similarity*100 + "% similar";
+    }
+
     function setLayer(newCanvasIndex) {
       document.getElementById("message").innerHTML = messages[newCanvasIndex - 1];
-      hasBeenOpened[newCanvasIndex - 1] = true;
+      frameData[newCanvasIndex - 1].hasBeenOpened = true;
       canvasIndex=newCanvasIndex-1;
         for(var i=0;i<numFrames;i++){
           if (layerElem[i]!==null){
@@ -464,6 +512,8 @@ function clearPalette(){
         if (numberOfPagesOpened() >= 9) {
           document.getElementById("shareButton").style.display = "";
         }
+
+        updateReflection();
     }
 
     function init() {
@@ -509,6 +559,10 @@ function clearPalette(){
 
       for (var i=0;i<numFrames;i++){
         hyperlinks[i] = [0,0,0,0];
+      }
+
+      for (var i=0; i<numFrames; ++i){
+        frameData[i]={strokesCount: 0, fillsCount: 0, hasBeenOpened: false};
       }
 
       visibleCanvas = document.getElementById("mainCanvas");
@@ -750,6 +804,10 @@ function clearPalette(){
   function mouseUp(e){
     e = e || window.event;
 
+    if (drawing){
+      ++frameData[canvasIndex].strokesCount;
+    }
+
     drawing=0;
     lastX=-1;
     lastY=-1;
@@ -828,6 +886,8 @@ function clearPalette(){
         drawCircle(canvas,p[0],p[1],radius,colorIndex);
       } else {
         floodFill(canvas, p[0], p[1], colorIndex);
+
+        ++frameData[canvasIndex].fillsCount;
       }
     }
   
@@ -864,12 +924,12 @@ function clearPalette(){
     var pixelIndexer = makePixelIndexer(width);
     var drawPixel = function(x,y){
        var idx = pixelIndexer(x,y);
-       canvas[idx] = colorIndex;  //red
+       canvas[idx] = colorIndex -1;
     };
     var drawRow = function(xL,xR,y){
       var idxL = Math.max(pixelIndexer(xL,y), y*width);
-      var idxR = Math.min(pixelIndexer(xR,y), (y+1)*width);
-      for (;idxL < idxR; ++idxL) {
+      var idxR = Math.min(pixelIndexer(xR,y), ((y+1)*width)-1);
+      for (;idxL <= idxR; ++idxL) {
         canvas[idxL] = colorIndex;
       }
     };
@@ -878,14 +938,14 @@ function clearPalette(){
       drawRow(x0 - y, x0 + y, y0 + x); // b
       drawRow(x0 - x, x0 + x, y0 - y); // c
       drawRow(x0 - y, x0 + y, y0 - x); // b
-      // drawPixel( x + x0,  y + y0); a
-      // drawPixel( y + x0,  x + y0); b
-      // drawPixel(-x + x0,  y + y0); a
-      // drawPixel(-y + x0,  x + y0); b
-      // drawPixel(-x + x0, -y + y0); c
-      // drawPixel(-y + x0, -x + y0); d
-      // drawPixel( x + x0, -y + y0); c
-      // drawPixel( y + x0, -x + y0); d
+      // drawPixel( x + x0,  y + y0); // a
+      // drawPixel( y + x0,  x + y0); // b
+      // drawPixel(-x + x0,  y + y0); // a
+      // drawPixel(-y + x0,  x + y0); // b
+      // drawPixel(-x + x0, -y + y0); // c
+      // drawPixel(-y + x0, -x + y0); // d
+      // drawPixel( x + x0, -y + y0); // c
+      // drawPixel( y + x0, -x + y0); // d
       y++;
       if (decisionOver2<=0){
         decisionOver2 += 2 * y + 1;   // Change in decision criterion for y -> y+1
@@ -894,6 +954,26 @@ function clearPalette(){
         decisionOver2 += 2 * (y - x) + 1;   // Change for y -> y+1, x -> x-1
       }
     }
+    // x = radius;
+    // y = 0;
+    // decisionOver2 = 1 - x
+    // while(x >= y){
+    //   drawPixel( x + x0,  y + y0); // a
+    //   drawPixel( y + x0,  x + y0); // b
+    //   drawPixel(-x + x0,  y + y0); // a
+    //   drawPixel(-y + x0,  x + y0); // b
+    //   drawPixel(-x + x0, -y + y0); // c
+    //   drawPixel(-y + x0, -x + y0); // d
+    //   drawPixel( x + x0, -y + y0); // c
+    //   drawPixel( y + x0, -x + y0); // d
+    //   y++;
+    //   if (decisionOver2<=0){
+    //     decisionOver2 += 2 * y + 1;   // Change in decision criterion for y -> y+1
+    //   }else{
+    //     x--;
+    //     decisionOver2 += 2 * (y - x) + 1;   // Change for y -> y+1, x -> x-1
+    //   }
+    // }
   }
 
   function drawCircle(canvas,x,y,radius,colorIndex){  
@@ -988,7 +1068,6 @@ function clearPalette(){
   font-size: 22px;
   padding: 4px;
   color:white;
-  text-shadow: 1px 1px #000000;
 }
 
 #message {
@@ -1009,7 +1088,7 @@ function clearPalette(){
 }
 
 .button:hover {
-  background-color: grey
+  background-color: grey;
 }
 
 .button.disabled:hover {
@@ -1076,7 +1155,7 @@ body {
                  }
                  a.layerItem{
                   color: white;
-                  background-color: black;
+                  background-color: clear;
                   text-decoration: none;
                   width:100%;
                   display:block;
@@ -1399,6 +1478,13 @@ body {
                       <a href="#" onclick="exportClick();return false;">&sdotb; export</a><br />
                       -->
                       <input type="file" accept=".html" id="my_file" style="display: none;" />
+                      <div id="reflection">
+                        <h1>look back with no regret</h1>
+                        <p><div id="strokesCountReflection">...</div></p>
+                        <p><div id="fillsCountReflection">...</div></p>
+                        <p><div id="hasBeenOpenedReflection">...</div></p>
+                        <p><div id="frameSixReflection">...</div></p>
+                      </div>
                       </center>
                     </td>
                     <td valign="top" id="brushes">
