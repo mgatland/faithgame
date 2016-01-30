@@ -553,8 +553,8 @@ function clearPalette(){
           for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
             colorUsageCount[countIndex]=0;
           }
-          for (var j2=0;j2<thumbHeight;j2++){
-            for (var i2=0;i2<thumbWidth;i2++){
+          for (var j2=0;j2<thumbHeightScale;j2++){
+            for (var i2=0;i2<thumbWidthScale;i2++){
               var sample = canvas[i*thumbWidthScale+i2+width*(j*thumbHeightScale+j2)];
               ++colorUsageCount[sample];
             }
