@@ -797,7 +797,11 @@ function clearPalette(){
   function mouseMove(e){
     e = e || window.event;
 
-    if (timers[canvasIndex] <= 0) return;
+    if (timers[canvasIndex] <= 0) {
+      visibleCanvas.style.cursor="not-allowed";
+
+      return;
+    }
 
     if (drawing===0)
       return;
