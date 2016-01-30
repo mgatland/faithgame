@@ -153,61 +153,13 @@ function importClick(){
 }
 function shareClick() {
   var str = stateToString();
-
-  var gistToCreate = {
-    "description" : "flickgame",
-    "public" : true,
-    "files": {
-      "readme.txt" : {
-        "content": "A game made with www.flickgame.org.  You can import game.txt there to play the game."
-      },
-      "game.txt" : {
-        "content": str
+  var request = new XMLHttpRequest();
+  request.onreadystatechange = function() { 
+          window.location = "/gallery.html";
       }
-    }
-  };
-
-  var githubURL = 'https://api.github.com/gists';
-  var githubHTTPClient = new XMLHttpRequest();
-  githubHTTPClient.open('POST', githubURL);
-  githubHTTPClient.onreadystatechange = function() {    
-    var errorCount=0;
-    if(githubHTTPClient.readyState!=4) {
-      return;
-    }   
-    var result = JSON.parse(githubHTTPClient.responseText);
-    if (githubHTTPClient.status===403) {
-      errorCount++;
-      alert(result.message);
-    } else if (githubHTTPClient.status!==200&&githubHTTPClient.status!==201) {
-      errorCount++;
-      alert("HTTP Error "+ githubHTTPClient.status + ' - ' + githubHTTPClient.statusText);
-    } else {
-      var id = result.id;
-      var url = "play.html?p="+id;
-      url=qualifyURL(url);
-
-      var editurl = "editor.html?hack="+id;
-      editurl=qualifyURL(editurl);
-      var sourceCodeLink = "link to source code:<br><a href=\""+editurl+"\">"+editurl+"</a>";
-
-      var shareLink = document.getElementById("shareLink");
-      shareLink.innerHTML = "<a target=\"_blank\" href=\""+url+"\">&#8627;"+id+"</a><br>";
-      shareLinkInner = shareLink.childNodes[0];
-
-      if (errorCount>0) {
-        alert("Cannot link directly to playable game, because there are errors.",true);
-      } else {
-
-      } 
-
-
-    }
-  }
-  githubHTTPClient.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-  var stringifiedGist = JSON.stringify(gistToCreate);
-  githubHTTPClient.send(stringifiedGist);
-    lastDownTarget=canvas;  
+  request.open('POST', '/newgame', true);
+  request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  request.send("file=" + str);
 }
 
 function RLE_encode(input) {
@@ -238,7 +190,7 @@ function stateToString(){
   var state = new Object();
   state.gameLink=gameLink;
   state.canvasses=new Array();
-  for (var i=0;i<10;i++){
+  for (var i=0;i<numFrames;i++){
     var canvas=canvasses[i];
     var s="";
     for (var j=0;j<width*height;j++){
@@ -469,12 +421,12 @@ function clearPalette(){
       bucketElem=document.getElementById("bucket");
 
 
-      for (var i=0;i<16;i++){
+      for (var i=0;i<numFrames;i++){
         canvasses[i]=new Uint8Array(width*height);
       }
 
-      for (var i=0;i<16;i++){
-        hyperlinks[i] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+      for (var i=0;i<numFrames;i++){
+        hyperlinks[i] = [0,0,0,0];
       }
 
       visibleCanvas = document.getElementById("mainCanvas");
@@ -1241,7 +1193,10 @@ body {
                         </table>
                       <a href="#" onclick="shareClick();return false;" id="shareButton">&ocir; it is done</a><br />
                       <div id="shareLink"></div>
+                      <!--
                       <a href="#" onclick="exportClick();return false;">&sdotb; export</a><br />
+                      -->
+                      <a href="/gallery.html">abandon this work</a><br />
                       <input type="file" accept=".html" id="my_file" style="display: none;" />
                       </center>
                     </td>

@@ -3,7 +3,7 @@
 <link rel="icon" 
       type="image/png" 
       href="favicon.png">
-<title>flickgame.org</title>
+<title>faithgame</title>
 <style>
 
 #header h1 {
@@ -155,6 +155,8 @@ function redraw(){
   }
   function mouseMove(e){
 
+    if (gameState == undefined) return;
+
     var coords = getCoords(e);
 
     var w = mainCanvasCtx.width;
@@ -244,13 +246,13 @@ function getData(){
     embeddedDat=decodeURI(embeddedDat);
     loadState(embeddedDat);
 
-    var homepage=gameState.gameLink;
+    /*var homepage=gameState.gameLink;
     var homepageLink = document.getElementById("homeLink");
     homepageLink.innerHTML=strip_http(homepage);
     if (!homepage.match(/^https?:\/\//)) {
       homepage = "http://" + homepage;
     }
-    homepageLink.href = homepage;
+    homepageLink.href = homepage;*/
 
     renderImages();
     return;
@@ -261,7 +263,7 @@ function getData(){
     return;
   }
 
-  var githubURL = 'https://api.github.com/gists/'+id;
+  var githubURL = '/game?id='+id;
 
   var githubHTTPClient = new XMLHttpRequest();
   githubHTTPClient.open('GET', githubURL);
@@ -275,11 +277,11 @@ function getData(){
     } else if (githubHTTPClient.status!==200&&githubHTTPClient.status!==201) {
       console.log("HTTP Error "+ githubHTTPClient.status + ' - ' + githubHTTPClient.statusText);
     }
-    var result = JSON.parse(githubHTTPClient.responseText);
-    var code=result["files"]["game.txt"]["content"];
+    var code=githubHTTPClient.responseText;
     console.log(code);
     loadState(code);
 
+/*
     var homepage=gameState.gameLink;
     var homepageLink = document.getElementById("homeLink");
     homepageLink.innerHTML=strip_http(homepage);
@@ -293,7 +295,7 @@ function getData(){
     var url = "index.html?p="+id;
     url=qualifyURL(url);
     hacklink.href=url;
-    hacklink.innerHTML="&sdotb; edit";
+    hacklink.innerHTML="&sdotb; edit";*/
     renderImages();
   }
   githubHTTPClient.setRequestHeader("Content-type","application/x-www-form-urlencoded");
@@ -321,6 +323,7 @@ function renderImages(){
   gameState.imageDats = new Array();
 
   for (var i=0;i<numFrames;i++){
+
     var canvas = document.createElement('canvas');
     canvas.width="100";
     canvas.height="100";
@@ -371,7 +374,7 @@ document.addEventListener("keydown", goFullscreen);
 </div>
 <p>
 <div id="footer">
- <a href="http://www.flickgame.org" id="hackLink"></a> <a  id="homeLink" href="http://www.flickgame.org"></a> 
+ <a href="/gallery.html" id="hackLink">back to gallery</a> <a  id="homeLink" href="/gallery.html"></a> 
 </div>
 </body>
 </html>

@@ -1,0 +1,16 @@
+{
+  "name": "faithgame",
+  "subdomain": "faithgame",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "version": "0.0.1",
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x"
+  },
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "express": "4.13.4"
+  }
+}

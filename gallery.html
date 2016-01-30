@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>Flick Games</title>
+    <style>
+      body {
+        background-color: black;
+        text-align: center;
+        color: white;
+        font-size: 32px;
+      }
+      img {
+        width:28%;
+        border: 1px solid grey;
+        float: left;
+        margin:2.5%;
+      }
+      .gallery {
+        margin: 2%;
+      }
+      br {
+        clear: both;
+      }
+      a {
+         color: white;
+        text-decoration: none;       
+      }
+      .gallery a {
+        display:inline-block;
+        width: 100px;
+        height: 100px;
+
+      }
+    </style>
+  </head>
+  <body>
+    <p>contemplate the work of others</p>
+    <div class="gallery">
+<!--<a href="cruel_world.html"><img src="cruel_world.png"></a>-->
+    </div>
+    <p><a href="/">perform the ritual</a></p>
+  </body>
+  <script>
+
+  var drawGallery = function(num) {
+    for(var i = 0; i < num; i++) {
+      var link = document.createElement("a");
+      link.href = "/play.html?p=" + i;
+      link.innerHTML = (i + 1);
+      document.querySelector(".gallery").appendChild(link);
+    }    
+  }
+
+  function httpGetAsync(theUrl, callback)
+  {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = function() { 
+          if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+              callback(xmlHttp.responseText);
+      }
+      xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+      xmlHttp.send(null);
+  }
+
+  httpGetAsync("/gamecount", drawGallery);
+
+  </script>
+</html>
