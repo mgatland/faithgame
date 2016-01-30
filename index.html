@@ -31,6 +31,19 @@
             getRandomColor()
             ];
 
+  var messages = [
+"frame 1 shall be drawn with a single stroke using the colour first chosen for you",
+"frame 2 shall be completed using an even number of brushstrokes",
+"frame 3 shall use exactly three of the four colours",
+"frame 4 shall link to four other frames",
+"frame 5 shall be drawn with the left hand",
+"frame 6 shall attempt to recreate frame 3",
+"frame 7 shall be left blank",
+"frame 8 shall be drawn while contemplating the beauty of the natural world",
+"frame 9 shall be drawn, but no other frames may link to it",
+"frame 10 shall depict a circular motif and link to no other frames"
+  ];
+
   var colorElem = new Array();
     var layerElem = new Array();
   var colorIndex=getRandomInt(1,4);
@@ -389,6 +402,7 @@ function clearPalette(){
     }
 
     function setLayer(newCanvasIndex) {
+      document.getElementById("message").innerHTML = messages[newCanvasIndex - 1];
       canvasIndex=newCanvasIndex-1;
         for(var i=0;i<16;i++){
           if (layerElem[i]!==null){
@@ -466,7 +480,7 @@ function clearPalette(){
       id_d=id.data;
       setVisuals();
       setColor(colorIndex);
-
+      document.getElementById("message").innerHTML = messages[0];
 
       getData();
     }
@@ -842,6 +856,12 @@ function clearPalette(){
   color:white;
 }
 
+#message {
+  font-size: 25px;
+  color:white;
+  margin: 5px;
+}
+
 body {
     -webkit-user-select: none; /* webkit (safari, chrome) browsers */
     -moz-user-select: none; /* mozilla browsers */
@@ -1014,6 +1034,7 @@ body {
                       <center>
                         <input width="640" style="border:2px solid gray;" onkeydown="event.stopPropagation();" value="www.flickgame.org"  id="linkInput" oninput="linkChange(this.value)" />
                         <br/>
+                        <div id="message"></div>
                         <canvas id="mainCanvas" width="600" height="600" style="border:2px solid gray; background-color:black;"></canvas>
                         <br />
                         <table style="border:2px solid gray; margin-top:2px" margin="0">
