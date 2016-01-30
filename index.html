@@ -14,6 +14,7 @@
   var numFrames = 10;
   var numColors = 4;
   var thumbSize = 20;
+  var begun = false;
 
   var shareLinkInner=null;
 
@@ -57,6 +58,10 @@ function qualifyURL(url) {
   return aurl.href;
 }
 
+var begin = function () {
+  begun = true;
+  document.getElementById("instructions").style.display = "none";
+}
 
 var radiusElem = new Array();
   var thumbnailCanvas = new Array();
@@ -113,7 +118,7 @@ var updateTimeDisplay = function() {
 }
 
 var advanceTimer = function() {
-  if (timers[canvasIndex] > 0) {
+  if (begun && timers[canvasIndex] > 0) {
     timers[canvasIndex]--;
   }
   updateTimeDisplay();
@@ -861,16 +866,27 @@ function clearPalette(){
   height: 60px;
 }
 
-#shareButton {
+.button {
   font-size:20px;
   border: 1px solid white;
   padding: 5px;
   margin:10px;
   display: inline-block;
-  text-decoration: none;
+  text-decoration: none;   
 }
-#shareButton:hover {
+
+.button:hover {
   background-color: grey
+}
+
+#instructions {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  display: block;
+  background-color: black;
+  z-index: 1;
+
 }
 
 body {
@@ -889,10 +905,11 @@ body {
                 }
                  body {
                  background-color:black;
-                 color: gray;
+                 color: white;
                  margin-top: 0;
                  padding-top: 0;
                  border-top: 0;
+                 font-size:22px;
                  }
                  ul {
                  list-style-type: none;
@@ -968,6 +985,21 @@ body {
   </head>
   <body onload="init();" ondragstart="return false;" ondrop="return false;">
   <center>
+    <div id="instructions">
+      <h1>faithgame</h1>
+      <p>the faithgame ritual shall take place in isolation and silence</p>
+      <p>the faithgame ritual shall last 20 minutes</p>
+      <p>during this time all distractions shall be avoided</p>
+      <p>the faithgame ritual shall always result in a completed faithgame</p>
+      <p>the rules for individual frames shall be followed</p>
+      <p>after the completion of a faithgame it shall be played</p>
+      <p>faithgames shall be released anonymously</p>
+      <p>faithgames shall not be imported into flickgame</p>
+      <p>the source code shall not be modified to ease the burden of the ritual</p>
+      <p>one hundred steps must be taken before repeating the faithgame ritual</p> 
+      <p><a onclick="begin();return false;" href="#" class="button">begin the ritual</a></p>
+      <p><a href="/gallery.html" class="button">contemplate the work of others</a><br></p>
+    </div>
     <table cellpadding="10">
       <tr>
         <td>
@@ -1211,12 +1243,11 @@ body {
                             </td>                           
                           </tr>
                         </table>
-                      <a href="#" onclick="shareClick();return false;" id="shareButton">&ocir; it is done</a><br />
+                      <a href="#" onclick="shareClick();return false;" class="button" id="shareButton">&ocir; it is done</a><br />
                       <div id="shareLink"></div>
                       <!--
                       <a href="#" onclick="exportClick();return false;">&sdotb; export</a><br />
                       -->
-                      <a href="/gallery.html">abandon this work</a><br />
                       <input type="file" accept=".html" id="my_file" style="display: none;" />
                       </center>
                     </td>
