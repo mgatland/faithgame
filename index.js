@@ -14,7 +14,7 @@ var deleteFromDatabase = saveToDatabase;
 
 var addGame = function(game) {
 	games.push(game);
-	gameSummaries.push({thumbnail:game.canvasses[0], colorPalette:game.colorPalette});
+	gameSummaries.push({thumbnail:game.canvasses[0], colorPalette:game.colorPalette, id:game._id});
 }
 
 app.use("/", express.static(__dirname + '/'));
@@ -23,17 +23,21 @@ app.post('/newgame', function(req, res){
     console.log("new game saved");
     var data = JSON.parse(req.body.file);
     addGame(data);
-    saveToDatabase(data);
+    saveToDatabase(data, games.length - 1);
     res.send('/play.html?p=' + (games.length - 1));
 });
 
 app.post("/remove", function(req, res) {
-	/*console.log("removing a game");
 	var gameToRemove = req.body.num;
-	console.log("game removed locally: " + gameToRemove);
 	res.send('ok');
-	games.splice(gameToRemove, 1);
-	deleteFromDatabase(req.body.num, req.body.pass);*/
+	gameSummaries.forEach(function (summary, index) {
+		if (summary.id == req.body.num) {
+			games.splice(index, 1);
+			gameSummaries.splice(index, 1);
+			console.log("removing game number " + index + " with id " + req.body.num);
+		}
+	});
+	deleteFromDatabase(req.body.num, req.body.pass);
 });
 
 app.get("/games", function(req, res){
@@ -48,6 +52,7 @@ app.get("/game", function(req, res){
 app.listen(port);
 
 var mongodb = require('mongodb');
+var ObjectId = require('mongodb').ObjectID;
 
 if (process.env.mongouser) {
 var uri = "mongodb://" + process.env.mongouser + ":" + process.env.mongopass + "@ds051665.mongolab.com:51665/faithgame"
@@ -66,31 +71,27 @@ var uri = "mongodb://" + process.env.mongouser + ":" + process.env.mongopass + "
 	    });
 	  });
 
-	  saveToDatabase = function (data) {
-  		dbGames.insert(data);
+	  saveToDatabase = function (data, gameIndex) {
+  		dbGames.insert(data, function (err, saved) {
+  			console.log("Saved game index " + gameIndex + " with id " + saved.ops[0]._id);
+  			//add the new database id to the game summary
+  			gameSummaries[gameIndex].id = saved.ops[0]._id;
+  		});
   		console.log("saved to db");
 	  };
 
-	  /*deleteFromDatabase = function (index, pass) {
+	  deleteFromDatabase = function (index, pass) {
 
 	  	if (process.env.mongopass != pass) {
 	  		console.log("Wrong password, not deleting from database");
 	  		return;
 	  	}
-
-		dbGames.find(function (err, cursor) {
-			var tempGames = [];
-			cursor.each(function (err, item) {
-			  if (item != null) {
-			    tempGames.push(item);
-			  }
-			});
-			console.log("removing from database: " + index)
-			console.log(tempGames.length);
-			var id = tempGames[parseInt(index)]._id;
-		  	dbPosts.remove({"_id": id});
-		  	console.log("removed a game");
-		});
-	  }*/
+	  	if (index == null || index == undefined || index == "") {
+	  		console.log("nope");
+	  		return;
+	  	}
+	  	console.log("removing from database too");
+		dbGames.remove({"_id":ObjectId(index)});
+	  }
 	});
 }

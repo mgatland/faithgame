@@ -27,14 +27,26 @@
          color: white;
          text-decoration: none;
       }
+      .id {
+        display: inline-block;
+        font-size: 12px;
+        margin-right: 20px;
+      }
+
+      .normal .id, .normal .leadership {
+        display: none;
+      }
     </style>
   </head>
-  <body>
+  <body class="normal">
     <p>contemplate the work of others</p>
     <div class="gallery">
 <!--<a href="cruel_world.html"><img src="cruel_world.png"></a>-->
     </div>
     <p><a href="/">perform the ritual</a></p>
+    <div class="leadership">
+      <input value="password" id="pass">
+    </div>
   </body>
   <script>
 
@@ -68,13 +80,23 @@
     for(var i = 0; i < games.length; i++) {
       var link = document.createElement("a");
       link.href = "/play.html?p=" + i;
+
       var pixels = RLE_decode(games[i].thumbnail);
       var colorPalette = games[i].colorPalette;
       var canvas = drawThumbnail(pixels, colorPalette);
       link.appendChild(canvas);
 
       document.querySelector(".gallery").appendChild(link);
-    }    
+
+      var id = document.createElement("a");
+      id.className += " id";
+      id.href = "#";
+      var gameId = games[i].id;
+      id.gameId = gameId;
+      id.onclick = function () {removeGame(this.gameId); return false;}
+      id.innerHTML += "delete";
+      document.querySelector(".gallery").appendChild(id);
+    }
   }
 
   function httpGetAsync(theUrl, callback)
@@ -90,5 +112,19 @@
 
   httpGetAsync("/games", drawGallery);
 
+  var removeGame = function(gameId) {
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function() { 
+            //document.getElementById("num").value = "";
+        }
+    request.open('POST', '/remove', true);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    request.send("num=" + gameId + "&pass=" + 
+      document.getElementById("pass").value );
+  }
+
+  if (location.search == "?leadership") {
+    document.querySelector("body").className = "";
+  }
   </script>
 </html>
