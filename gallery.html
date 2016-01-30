@@ -11,27 +11,21 @@
         color: white;
         font-size: 32px;
       }
-      img {
-        width:28%;
-        border: 1px solid grey;
-        float: left;
-        margin:2.5%;
+      canvas {
+        border: 1px solid black;
+        margin:5px;
+        display:inline-block;
+      }
+      canvas:hover {
+        border: 1px solid white;
       }
       .gallery {
-        margin: 2%;
-      }
-      br {
-        clear: both;
+        margin: auto;
+        max-width: 1024px;
       }
       a {
          color: white;
-        text-decoration: none;       
-      }
-      .gallery a {
-        display:inline-block;
-        width: 100px;
-        height: 100px;
-
+         text-decoration: none;
       }
     </style>
   </head>
@@ -44,11 +38,41 @@
   </body>
   <script>
 
-  var drawGallery = function(num) {
-    for(var i = 0; i < num; i++) {
+  function RLE_decode(encoded) {
+      var output = "";
+      for (var i = 0; i < encoded.length; i += 2) {
+        output += new Array(1+encoded[i]).join(encoded[i+1])
+      }
+      return output;
+  }
+
+  var drawThumbnail = function (pixels, colorPalette) {
+    var canvas = document.createElement("canvas");
+    var width = 100;
+    var height = 100;
+    var zoomFactor = 1;
+    canvas.width = width * zoomFactor;
+    canvas.height = height * zoomFactor;
+    var visibleContext = canvas.getContext("2d");
+    for (var i=0;i<width;i++){
+      for (var j=0;j<height;j++){
+        var pixelIndex = pixels[i+width*j]; 
+        visibleContext.fillStyle=colorPalette[pixelIndex];
+        visibleContext.fillRect(i*zoomFactor,j*zoomFactor,zoomFactor,zoomFactor);
+      }
+    }
+    return canvas;
+  }
+
+  var drawGallery = function(games) {
+    for(var i = 0; i < games.length; i++) {
       var link = document.createElement("a");
       link.href = "/play.html?p=" + i;
-      link.innerHTML = (i + 1);
+      var pixels = RLE_decode(games[i].thumbnail);
+      var colorPalette = games[i].colorPalette;
+      var canvas = drawThumbnail(pixels, colorPalette);
+      link.appendChild(canvas);
+
       document.querySelector(".gallery").appendChild(link);
     }    
   }
@@ -58,13 +82,13 @@
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = function() { 
           if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-              callback(xmlHttp.responseText);
+              callback(JSON.parse(xmlHttp.responseText));
       }
       xmlHttp.open("GET", theUrl, true); // true for asynchronous 
       xmlHttp.send(null);
   }
 
-  httpGetAsync("/gamecount", drawGallery);
+  httpGetAsync("/games", drawGallery);
 
   </script>
 </html>

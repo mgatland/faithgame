@@ -639,8 +639,8 @@ function clearPalette(){
       // }
       // document.body.style.backgroundColor = colorPalette[majorityColorIndex];
       if (genAllThumbnails===true){
-        for (var i=0;i<16;i++){
-          drawThumbnail(i);          
+        for (var i=0;i<numFrames;i++){
+          drawThumbnail(i);
         }
       } else {
         drawThumbnail(canvasIndex);

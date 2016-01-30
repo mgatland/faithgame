@@ -7,16 +7,22 @@ var app = express();
 var port = process.env.PORT || 8080;
 
 var games = [];
+var gameSummaries = [];
 
 var saveToDatabase = function () {console.log("no database");};
 var deleteFromDatabase = saveToDatabase;
+
+var addGame = function(game) {
+	games.push(game);
+	gameSummaries.push({thumbnail:game.canvasses[0], colorPalette:game.colorPalette});
+}
 
 app.use("/", express.static(__dirname + '/'));
 app.use(bodyParser());
 app.post('/newgame', function(req, res){
     console.log("new game saved");
     var data = JSON.parse(req.body.file);
-    games[games.length] = data
+    addGame(data);
     saveToDatabase(data);
     res.send('/play.html?p=' + (games.length - 1));
 });
@@ -30,8 +36,8 @@ app.post("/remove", function(req, res) {
 	deleteFromDatabase(req.body.num, req.body.pass);*/
 });
 
-app.get("/gamecount", function(req, res){
-	res.send(""+games.length);
+app.get("/games", function(req, res){
+	res.send(gameSummaries);
 });
 
 app.get("/game", function(req, res){
@@ -55,7 +61,7 @@ var uri = "mongodb://" + process.env.mongouser + ":" + process.env.mongopass + "
 	    cursor.each(function (err, item) {
 	      if (item != null) {
 	      	console.log("loaded a game");
-	        games.push(item);
+	        addGame(item);
 	      }
 	    });
 	  });
