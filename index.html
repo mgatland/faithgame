@@ -151,7 +151,7 @@ var updateTimeDisplay = function() {
 }
 
 var advanceTimer = function() {
-  if (begun) {
+  if (begun && !finished) {
     if (timers[canvasIndex] > 0) {
       timers[canvasIndex]-=timerInterval*secondsPerMilisecond;
     } else {
@@ -267,6 +267,7 @@ function stateToString(){
   }
   state.hyperlinks=hyperlinks;
   state.colorPalette = colorPalette;
+  state.frameData=frameData;
   var result=JSON.stringify(state);
   return result;
 }
@@ -511,6 +512,10 @@ function clearPalette(){
         updateTimeDisplay();
         if (numberOfPagesOpened() >= 9) {
           document.getElementById("shareButton").style.display = "";
+        }
+
+        if (timers[canvasIndex] > 0) {
+          visibleCanvas.style.cursor="crosshair";
         }
 
         updateReflection();
