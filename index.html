@@ -381,7 +381,7 @@ function clearPalette(){
     function setLayer(newCanvasIndex) {
       document.getElementById("message").innerHTML = messages[newCanvasIndex - 1];
       canvasIndex=newCanvasIndex-1;
-        for(var i=0;i<16;i++){
+        for(var i=0;i<numFrames;i++){
           if (layerElem[i]!==null){
             layerElem[i].setAttribute("class","layerItem");
           }
@@ -404,7 +404,7 @@ function clearPalette(){
         
       }
 
-      for (var i=0;i<10;i++){
+      for (var i=0;i<numFrames;i++){
         elem = document.getElementById("thumbnail"+(i+1));
         elem.width=thumbSize;
         elem.height=thumbSize;
@@ -422,7 +422,7 @@ function clearPalette(){
         colorElem[i]=elem;
       }
 
-      for (var i=0;i<16;i++){
+      for (var i=0;i<numFrames;i++){
         elem = document.getElementById("layerItem"+(i+1));        
         layerElem[i]=elem;
       }
