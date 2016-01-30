@@ -11,6 +11,8 @@
   var canvasIndex=0;
   var canvasses = new Array();
   var hyperlinks = new Array();
+  var numFrames = 10;
+  var numColors = 4;
 
   var shareLinkInner=null;
 
@@ -79,7 +81,11 @@ var get_blob = function() {
     return self.Blob;
 }
 
-var timer = 600;
+var timers = [];
+for (var i = 0; i < numFrames; i++)
+{
+  timers[i] = 60 * 2;
+}
 
 var getTwoDigitNum = function (num) {
   if (num >= 10) return num;
@@ -87,6 +93,10 @@ var getTwoDigitNum = function (num) {
 }
 
 var getDigitalTime = function (num) {
+  if (num <= 0)
+  {
+    return "0:00";
+  }
   if (num < 60)
   {
     return "0:" + getTwoDigitNum(num);
@@ -95,9 +105,13 @@ var getDigitalTime = function (num) {
   }
 }
 
+var updateTimeDisplay = function() {
+  document.getElementById("timer").innerHTML = getDigitalTime(timers[canvasIndex]);
+}
+
 var advanceTimer = function() {
-  timer--;
-  document.getElementById("timer").innerHTML = getDigitalTime(timer);
+  timers[canvasIndex]--;
+  updateTimeDisplay();
 }
 setInterval(function () {
   advanceTimer();
@@ -412,9 +426,10 @@ function clearPalette(){
         }
         layerElem[canvasIndex].setAttribute("class","layerItem selectedItem");
         setVisuals();
-        for(var i=0;i<16;i++){
+        for(var i=0;i<numColors;i++){
           dropdownOption[i].value=hyperlinks[canvasIndex][i];
         }
+        updateTimeDisplay();
     }
 
     function init() {
@@ -480,6 +495,7 @@ function clearPalette(){
       document.getElementById("message").innerHTML = messages[0];
 
       getData();
+      updateTimeDisplay();
     }
 
   function readFile(evt) {
