@@ -13,6 +13,7 @@
   var hyperlinks = new Array();
   var numFrames = 10;
   var numColors = 4;
+  var thumbSize = 20;
 
   var shareLinkInner=null;
 
@@ -106,7 +107,9 @@ var getDigitalTime = function (num) {
 }
 
 var updateTimeDisplay = function() {
-  document.getElementById("timer").innerHTML = getDigitalTime(timers[canvasIndex]);
+  for (var timerIndex=0; timerIndex<numFrames; ++timerIndex) {
+    document.getElementById("thumbTimer"+(timerIndex+1)).innerHTML = getDigitalTime(timers[timerIndex]);
+  }
 }
 
 var advanceTimer = function() {
@@ -391,13 +394,15 @@ function clearPalette(){
           
       radii = new Array();
       for (var i=0;i<16;i++){
-        elem = document.getElementById("radius_"+(i+1));                
+        elem = document.getElementById("radius_"+(i+1));
         radiusElem[i]=elem;
         
       }
 
       for (var i=0;i<10;i++){
-        elem = document.getElementById("thumbnail"+(i+1));        
+        elem = document.getElementById("thumbnail"+(i+1));
+        elem.width=thumbSize;
+        elem.height=thumbSize;
         thumbnailCanvas[i]=elem;
         thumbnailContext[i]=elem.getContext("2d");
       }
@@ -527,9 +532,15 @@ function clearPalette(){
 
 
     function drawThumbnail(n){
+      var thumbWidth=thumbSize;
+      var thumbHeight=thumbSize;
+      thumbnailCanvas[n].width = thumbWidth;
+      thumbnailCanvas[n].height = thumbWidth;
+      var thumbWidthScale = width/thumbWidth;
+      var thumbHeightScale = height/thumbHeight;
       thumbCtx=thumbnailContext[n];
       thumbCtx.fillStyle="#FF0000";
-      thumbCtx.fillRect(0,0,10,10);
+      thumbCtx.fillRect(0,0,thumbWidth,thumbWidth);
       //thumbCtx.imageSmoothingEnabled = false;
       //thumbCtx.mozImageSmoothingEnabled = false;
       //thumbCtx.oImageSmoothingEnabled = false;
@@ -537,15 +548,15 @@ function clearPalette(){
       //thumbCtx.msImageSmoothingEnabled = false;
       var canvas=canvasses[n];
       var colorUsageCount=[];
-      for (var i=0;i<10;i++){
-        for (var j=0;j<10;j++){
+      for (var j=0;j<thumbHeight;j++){
+        for (var i=0;i<thumbWidth;i++){
           for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
             colorUsageCount[countIndex]=0;
           }
-          for (var i2=0;i2<10;i2++){              
-            for (var j2=0;j2<10;j2++){
-                var sample = canvas[i*10+i2+width*(j*10+j2)];
-                ++colorUsageCount[sample];
+          for (var j2=0;j2<thumbHeight;j2++){
+            for (var i2=0;i2<thumbWidth;i2++){
+              var sample = canvas[i*thumbWidthScale+i2+width*(j*thumbHeightScale+j2)];
+              ++colorUsageCount[sample];
             }
           }
           var majorityColorIndex=0;
@@ -567,16 +578,16 @@ function clearPalette(){
       //visibleContext.drawImage(canvasses[canvasIndex], 0, 0); 
       //visibleContext.drawImage(canvasses[canvasIndex], 0, 0,width*zoomFactor,height*zoomFactor); 
       canvas=canvasses[canvasIndex];
-      var colorUsageCount=[];
-      for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
-        colorUsageCount[countIndex]=0;
-      }
+      // var colorUsageCount=[];
+      // for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
+      //   colorUsageCount[countIndex]=0;
+      // }
       for (var i=0;i<width;i++){
         for (var j=0;j<height;j++){
           var pixelIndex = canvas[i+width*j]; 
           visibleContext.fillStyle=colorPalette[pixelIndex];
           visibleContext.fillRect(i*zoomFactor,j*zoomFactor,zoomFactor,zoomFactor);
-          ++colorUsageCount[pixelIndex];
+          // ++colorUsageCount[pixelIndex];
         }
       }
       // var majorityColorIndex=0;
@@ -952,7 +963,7 @@ body {
     /*]]>*/
     </style>
     <title>
-      flickgame.org
+      faithgame
     </title>
   </head>
   <body onload="init();" ondragstart="return false;" ondrop="return false;">
@@ -960,55 +971,64 @@ body {
     <table cellpadding="10">
       <tr>
         <td>
-          <div id="timer"></div>
           <ul>
             <li> 
               <a class="layerItem selectedItem" id="layerItem1" href="#" onclick="setLayer(1);return false;">
+              <div id="thumbTimer1"></div>
               <canvas id="thumbnail1" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               1</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem2" href="#" onclick="setLayer(2);return false;">
+              <div id="thumbTimer2"></div>
               <canvas id="thumbnail2" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               2</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem3" href="#" onclick="setLayer(3);return false;">
+              <div id="thumbTimer3"></div>
               <canvas id="thumbnail3" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               3</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem4" href="#" onclick="setLayer(4);return false;">
+              <div id="thumbTimer4"></div>
               <canvas id="thumbnail4" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               4</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem5" href="#" onclick="setLayer(5);return false;">
+              <div id="thumbTimer5"></div>
               <canvas id="thumbnail5" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               5</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem6" href="#" onclick="setLayer(6);return false;">
+              <div id="thumbTimer6"></div>
               <canvas id="thumbnail6" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               6</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem7" href="#" onclick="setLayer(7);return false;">
+              <div id="thumbTimer7"></div>
               <canvas id="thumbnail7" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               7</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem8" href="#" onclick="setLayer(8);return false;">
+              <div id="thumbTimer8"></div>
               <canvas id="thumbnail8" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               8</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem9" href="#" onclick="setLayer(9);return false;">
+              <div id="thumbTimer9"></div>
               <canvas id="thumbnail9" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               9</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem10" href="#" onclick="setLayer(10);return false;">
+              <div id="thumbTimer10"></div>
               <canvas id="thumbnail10" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
               10</a>
             </li>
