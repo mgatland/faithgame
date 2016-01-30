@@ -349,7 +349,6 @@ function press(evt){
 
   var visibleCanvas;
   var visibleContext;
-  var linkInput;
   var id;
   var id_d;
 
@@ -418,11 +417,7 @@ function clearPalette(){
 
     function init() {
 
-      
-      linkInput=document.getElementById("linkInput");
-      linkInput.value=gameLink;
-
-      
+          
       radii = new Array();
       for (var i=0;i<16;i++){
         elem = document.getElementById("radius_"+(i+1));                
@@ -611,7 +606,6 @@ function clearPalette(){
       } else {
         drawThumbnail(canvasIndex);
       }
-      linkInput.value=gameLink;
     }
 
 
@@ -860,6 +854,7 @@ function clearPalette(){
   font-size: 25px;
   color:white;
   margin: 5px;
+  max-width:600px;
 }
 
 body {
@@ -893,14 +888,6 @@ body {
                  font-size: 200%;
                  text-align: center;
                  margin-bottom: 5px;
-                 }
-                 input#linkInput {
-                 background-color: black;
-                 color:white;
-                 font-size: 150%;
-                 text-align: center;
-                 margin-bottom: 5px;
-                 padding-bottom:3px;
                  }
                  li {
                  font-size: 150%;                 
@@ -1032,7 +1019,6 @@ body {
                   <tr>
                     <td>
                       <center>
-                        <input width="640" style="border:2px solid gray;" onkeydown="event.stopPropagation();" value="www.flickgame.org"  id="linkInput" oninput="linkChange(this.value)" />
                         <br/>
                         <div id="message"></div>
                         <canvas id="mainCanvas" width="600" height="600" style="border:2px solid gray; background-color:black;"></canvas>
