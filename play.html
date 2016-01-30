@@ -80,6 +80,7 @@ a {
 var embeddedDat="__EMBED__";
 <!--__EmbedEnd__-->
 
+var numFrames = 10;
 var zoom=1;
 var currentIndex=0;
 function redraw(){
@@ -319,7 +320,7 @@ var imageCtxts = new Array();
 function renderImages(){
   gameState.imageDats = new Array();
 
-  for (var i=0;i<16;i++){
+  for (var i=0;i<numFrames;i++){
     var canvas = document.createElement('canvas');
     canvas.width="100";
     canvas.height="100";
