@@ -110,7 +110,9 @@ var updateTimeDisplay = function() {
 }
 
 var advanceTimer = function() {
-  timers[canvasIndex]--;
+  if (timers[canvasIndex] > 0) {
+    timers[canvasIndex]--;
+  }
   updateTimeDisplay();
 }
 setInterval(function () {
@@ -672,6 +674,8 @@ function clearPalette(){
   }
 
   function mouseDown(e){
+
+    if (timers[canvasIndex] <= 0) return;
     e = e || window.event;
 
     drawing=1;
@@ -737,6 +741,8 @@ function clearPalette(){
 
   function mouseMove(e){
     e = e || window.event;
+
+    if (timers[canvasIndex] <= 0) return;
 
     if (drawing===0)
       return;
