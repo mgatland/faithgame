@@ -30,12 +30,30 @@
       return color;
   }
 
-  var colorPalette = [
-            getRandomColor(),
-            getRandomColor(),
-            getRandomColor(),
-            getRandomColor()
-            ];
+
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+
+  var colorPalette = null;
+  var oldColors = getCookie("colorPalette");
+  if (oldColors) {
+    colorPalette = JSON.parse(oldColors);
+    if (!colorPalette || !colorPalette.length || colorPalette.length != numColors) {
+      colorPalette = null;
+    }
+  }
+  if (colorPalette == null) {
+    colorPalette = [
+              getRandomColor(),
+              getRandomColor(),
+              getRandomColor(),
+              getRandomColor()
+              ];
+    document.cookie = "colorPalette=" + JSON.stringify(colorPalette);
+  }
 
   var messages = [
 "frame 1 shall be drawn with a single stroke using the colour first chosen for you",
@@ -205,6 +223,9 @@ function shareClick() {
   request.open('POST', '/newgame', true);
   request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   request.send("file=" + str);
+
+  //allow new colors
+  document.cookie = "colorPalette=null";
 
   //prevent multiple submissions
   var button = document.getElementById("shareButton");
