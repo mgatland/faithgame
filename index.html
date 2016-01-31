@@ -7,7 +7,7 @@
 <script type="text/javascript" > 
   var contexts = new Array();
   var version="0.1";
-  var gameLink="www.flickgame.org"
+  var gameLink=""
   var canvasIndex=0;
   var canvasses = new Array();
   var hyperlinks = new Array();
@@ -179,7 +179,7 @@ function buildStandalone(sourceCode) {
 
   var BB = get_blob();
   var blob = new BB([htmlString], {type: "text/plain;charset=utf-8"});
-  saveAs(blob, "flickgame.html");
+  saveAs(blob, "faithgame.html");
 }
 
 function exportClick(){
@@ -1234,8 +1234,7 @@ function clearPalette(){
 }
 
 #instructions {
-  position: fixed;
-  height: 100%;
+  position: absolute;
   width: 100%;
   display: block;
   background-color: black;
@@ -1349,13 +1348,24 @@ body {
   <center>
     <div id="instructions">
       <h1>faithgame</h1>
-      <p>the faithgame ritual shall take place in 20 minutes of isolation and silence</p>
-      <p>each frame shall be drawn in 2 minutes and in accordance with its unique rules</p>
+      <p>faithgame is a denomination of <a href="http://www.flickgame.org/">flickgame</a></p>
+      <p>by first <a href="http://www.flickgame.org/help.html">knowing flickgame</a>, you may come to better understand our ways</p>
+      <p>faithgames should not be created without first acknowledging the faithgame canon</p>
+      <p><a href="/gallery.html" class="button">contemplate existing faithgames</a></p>
+      <br>
+      <h1>performing the faithgame ritual</h1>
+      <p>do not attempt the faithgame ritual unprepared</p>
+      <p>the faithgame ritual shall take place in 20 minutes of isolation and silence</p>      
       <p>the faithgame ritual shall always result in a completed faithgame</p>
+      <p>faithgames shall consist of 10 frames, drawn with 4 colours</p>
+      <p>each frame shall be drawn in 2 minutes and in accordance with its unique rules</p>
+      <p>each colour may act as a link to one of the other frames</p>
+      <p>links shall bne set using the drop-down menus below the colour selection palette</p>
+      <p>frames shall be switched between via the menu to the left of the canvas</p>
       <p>faithgames shall only be released anonymously</p>
       <p>100 steps must be taken before repeating the faithgame ritual</p>
-      <p><a onclick="begin();return false;" href="#" class="button">begin the ritual</a></p>
-      <p><a href="/gallery.html" class="button">contemplate the work of others</a><br></p>
+      <p><a onclick="begin();return false;" href="#" class="button">begin the faithgame ritual</a></p>
+      <br>
     </div>
     <table cellpadding="10">
       <tr>
