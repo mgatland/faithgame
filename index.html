@@ -187,15 +187,6 @@ function exportClick(){
   buildStandalone(embedDat);
 }
 
-function importClick(){
-  var reader = new FileReader();
-
-  reader.onload = function(e) {
-   var text = reader.result;
-  }
-
-  reader.readAsText(file, encoding);
-}
 function shareClick() {
   if (window.location.hostname.indexOf("heroku") == -1) {
     exportClick();
@@ -291,7 +282,7 @@ function stringToState(str){
     }
     canvasses.push(ar);
   }
-
+  colorPalette = state.colorPalette;
   hyperlinks=state.hyperlinks;
 }
 
@@ -591,7 +582,15 @@ function clearPalette(){
 
       getData();
       updateTimeDisplay();
+
+      if (location.search === "?leadership") {
+        document.querySelector("body").className += " leadership";
+      }
     }
+
+ function leadership () {
+  document.querySelector("body").className += " leadership";
+ }
 
   function readFile(evt) {
     //Retrieve the first (and only!) File from the FileList object
@@ -609,6 +608,9 @@ function clearPalette(){
         var ss2=ss1.substr(ss1.indexOf("=")+2);
         var decoded = decodeURI(ss2);
         var decoded2 = decoded.substring(0, decoded.length - 3);
+        if (decoded2.substring(decoded2.length - 1) == "\"") {
+          decoded2 = decoded2.substring(0, decoded2.length - 1);
+        }
         stringToState(decoded2);
         setVisuals(true);
         setLayer(canvasIndex+1); 
@@ -1061,6 +1063,7 @@ function clearPalette(){
       }
     }
   }
+
 </script>
 
     <style type="text/css">
@@ -1117,6 +1120,14 @@ function clearPalette(){
   background-color: black;
   z-index: 1;
 
+}
+
+.secret {
+  display: none;
+}
+
+.leadership .secret {
+  display: inherit;
 }
 
 body {
@@ -1474,16 +1485,19 @@ body {
                         </table>
                       <a href="#" onclick="shareClick();return false;" style="display:none" class="button" id="shareButton">&ocir; it is done</a><br />
                       <div id="shareLink"></div>
-                      <!--
-                      <a href="#" onclick="exportClick();return false;">&sdotb; export</a><br />
-                      -->
-                      <input type="file" accept=".html" id="my_file" style="display: none;" />
-                      <div id="reflection">
-                        <h1>look back with no regret</h1>
-                        <p><div id="strokesCountReflection">...</div></p>
-                        <p><div id="fillsCountReflection">...</div></p>
-                        <p><div id="hasBeenOpenedReflection">...</div></p>
-                        <p><div id="frameSixReflection">...</div></p>
+                      
+                      <div class="secret">
+                        <a href="#" onclick="document.getElementById('my_file').click();return false;">&sdotb; import</a><br />
+                        <input type="file" accept=".html" id="my_file" style="display: none;" />
+                        <a href="#" onclick="exportClick();return false;">&sdotb; export</a><br />
+                        <input type="file" accept=".html" id="my_file" style="display: none;" />
+                        <div id="reflection">
+                          <h1>look back with no regret</h1>
+                          <p><div id="strokesCountReflection">...</div></p>
+                          <p><div id="fillsCountReflection">...</div></p>
+                          <p><div id="hasBeenOpenedReflection">...</div></p>
+                          <p><div id="frameSixReflection">...</div></p>
+                        </div>
                       </div>
                       </center>
                     </td>
