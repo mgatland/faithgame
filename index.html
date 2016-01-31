@@ -1113,7 +1113,8 @@ function clearPalette(){
   function drawCircle(canvas,x,y,radius,colorIndex){  
     radius=Math.floor(radius/2)+1;
     if (radius==1){
-      canvas[x+width*y]=colorIndex;
+      var idx=Math.min(width-1, x)+width*Math.min(height-1, y);
+      canvas[idx]=colorIndex;
       return;
     } else if (radius==2){
       var points = [[x,y],[x-1,y],[x,y+1],[x+1,y],[x,y-1]];
