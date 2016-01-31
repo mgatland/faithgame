@@ -478,12 +478,131 @@ function clearPalette(){
       return similarity;
     }
 
+    function countColorUsage(canvas) {
+      colorUsageCount=[];
+      for (var countIndex=0; countIndex<colorPalette.length; ++countIndex) {
+        colorUsageCount[countIndex]=0;
+      }
+      for (var j=0;j<height;j++){
+        for (var i=0;i<width;i++){
+          var sample = canvas[i+j*width];
+          ++colorUsageCount[sample];
+        }
+      }
+      return colorUsageCount;
+    }
+
     function updateReflection() {
-      document.getElementById("strokesCountReflection").innerHTML = frameData[canvasIndex].strokesCount + " strokes";
-      document.getElementById("fillsCountReflection").innerHTML = frameData[canvasIndex].fillsCount + " fills";
-      document.getElementById("hasBeenOpenedReflection").innerHTML = frameData[canvasIndex].hasBeenOpened ? "this frame has been viewed" : "this frame has not been viewed";
+      var complianceScore = 0.0;
+      var frameInQuestion=0;
+      // NOTE: frame 1
+      if (frameData[frameInQuestion].strokesCount==1) {
+        complianceScore+=1.0;
+      } else {
+        // zero points
+      }
+      ++frameInQuestion;
+      // NOTE: frame 2
+      if (frameData[frameInQuestion].strokesCount%2==0) {
+        complianceScore+=1.0;
+      } else {
+        // zero points
+      }
+      ++frameInQuestion;
+      // NOTE: frame 3
+      {
+        var colorUsage=countColorUsage(canvasses[frameInQuestion]);
+        var usedColors=0;
+        for (var i=0; i<colorUsage.length; ++i) {
+          if (colorUsage[i] > 0) {
+            ++usedColors;
+          }
+        }
+        if (usedColors==3) {
+          complianceScore+=1.0;
+        } else {
+          // zero points
+        }
+      }
+      ++frameInQuestion;
+      // NOTE: frame 4
+      {
+        var linkUsage=[];
+        for (var linkUsageIndex=0; linkUsageIndex<numFrames; ++linkUsageIndex) {
+          linkUsage[linkUsageIndex]=0;
+        }
+        for (var linkIndex=1; linkIndex<numColors; ++linkIndex) {
+          var linksTo=hyperlinks[frameInQuestion][linkIndex];
+          ++linkUsage[linksTo];
+        }
+        var usedLinks=0;
+        for (var linkIndex=0; linkIndex<numColors; ++linkIndex) {
+          if (linkUsage[linkIndex]>0) {
+            ++usedLinks;
+          }
+        }
+        if (usedLinks==4) {
+          complianceScore+=1.0;
+        } else {
+          // zero points
+        }
+      }
+      ++frameInQuestion;
+      // NOTE: frame 5
+      {
+        // left handed drawing is unscored
+      }
+      ++frameInQuestion;
+      // NOTE: frame 6
       var similarity=compareCanvasses(canvasses[2], canvasses[5]);
-      document.getElementById("frameSixReflection").innerHTML = similarity*100 + "% similar";
+      complianceScore+=similarity;
+      ++frameInQuestion;
+      // NOTE: frame 7
+      if (frameData[frameInQuestion].strokesCount==0 &&
+          frameData[frameInQuestion].fillsCount==0) {
+        complianceScore+=1.0;
+      } else {
+        // zero points
+      }
+      ++frameInQuestion;
+      // NOTE: frame 8
+      {
+        // contemplation of the natural world is unscored
+      }
+      ++frameInQuestion;
+      // NOTE: frame 9
+      {
+        var strokeCountOnFrame=frameData[frameInQuestion].strokesCount;
+        var score=strokeCountOnFrame/3.0;
+        score=Math.min(1.0, Math.max(0.0, score));
+
+        for (var frameIndex=0; frameIndex<numFrames; ++frameIndex) {
+          if (frameIndex!=frameInQuestion) {
+            for (var linkIndex=0; linkIndex<numColors; ++linkIndex) {
+              var linksTo=hyperlinks[frameIndex][linkIndex];
+              if (linksTo==frameInQuestion) {
+                score-=1.0;
+                break;
+              }
+            }
+          }
+        }
+
+        score=Math.min(1.0, Math.max(0.0, score));
+        complianceScore+=score;
+      }
+      ++frameInQuestion;
+      // NOTE: frame 10
+      {
+        var score=1.0;
+        for (var linkIndex=0; linkIndex<numColors; ++linkIndex) {
+          var linksTo=hyperlinks[8][linkIndex];
+          score-=linksTo;
+        }
+        score=Math.min(1.0, Math.max(0.0, score));
+        complianceScore+=score;
+      }
+      console.log("compliance score is " + complianceScore);
     }
 
     function setLayer(newCanvasIndex) {
@@ -873,8 +992,8 @@ function clearPalette(){
 
     var coords = getCoords(e);
 
-    var x = Math.floor(-1+coords[0]/zoomFactor);
-    var y = Math.floor(-1+coords[1]/zoomFactor);
+    var x = Math.round(-1+coords[0]/zoomFactor);
+    var y = Math.round(-1+coords[1]/zoomFactor);
 
 
     var canvas=canvasses[canvasIndex];
@@ -1201,7 +1320,7 @@ body {
                  border: 2px solid black;
                  }
                  img.radius {
-                  border: 1px solid black;
+                  border: 1px solid transparent;
                  }
                  img.selected {
                   border: 1px solid red; 
@@ -1491,13 +1610,6 @@ body {
                         <input type="file" accept=".html" id="my_file" style="display: none;" />
                         <a href="#" onclick="exportClick();return false;">&sdotb; export</a><br />
                         <input type="file" accept=".html" id="my_file" style="display: none;" />
-                        <div id="reflection">
-                          <h1>look back with no regret</h1>
-                          <p><div id="strokesCountReflection">...</div></p>
-                          <p><div id="fillsCountReflection">...</div></p>
-                          <p><div id="hasBeenOpenedReflection">...</div></p>
-                          <p><div id="frameSixReflection">...</div></p>
-                        </div>
                       </div>
                       </center>
                     </td>
