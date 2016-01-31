@@ -925,8 +925,8 @@ function clearPalette(){
     var coords = getCoords(e);
     startTargetX=coords[0];
     startTargetY=coords[1];
-    lastX=Math.floor(-1+startTargetX/zoomFactor);
-    lastY=Math.floor(-1+startTargetY/zoomFactor);
+    lastX=Math.round(-1+startTargetX/zoomFactor);
+    lastY=Math.round(-1+startTargetY/zoomFactor);
     
     preserveUndoState();
     mouseMove(e);
@@ -1000,8 +1000,8 @@ function clearPalette(){
 
     var coords = getCoords(e);
 
-    var x = Math.floor(-1+coords[0]/zoomFactor);
-    var y = Math.floor(-1+coords[1]/zoomFactor);
+    var x = Math.round(-1+coords[0]/zoomFactor);
+    var y = Math.round(-1+coords[1]/zoomFactor);
 
 
     var canvas=canvasses[canvasIndex];
@@ -1034,8 +1034,8 @@ function clearPalette(){
     setVisuals();
 
     var coords = getCoords(e);
-    lastX=Math.floor(-1+coords[0]/zoomFactor);
-    lastY=Math.floor(-1+coords[1]/zoomFactor);
+    lastX=Math.round(-1+coords[0]/zoomFactor);
+    lastY=Math.round(-1+coords[1]/zoomFactor);
     
   }
 
@@ -1113,7 +1113,7 @@ function clearPalette(){
   function drawCircle(canvas,x,y,radius,colorIndex){  
     radius=Math.floor(radius/2)+1;
     if (radius==1){
-      var idx=Math.min(width-1, x)+width*Math.min(height-1, y);
+      var idx=Math.max(0, Math.min(width-1, x))+width*Math.min(height-1, y);
       canvas[idx]=colorIndex;
       return;
     } else if (radius==2){
