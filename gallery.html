@@ -76,7 +76,15 @@
     return canvas;
   }
 
+
+  function compareCompliance(a,b) {
+    return b.compliance - a.compliance;
+  }
+
   var drawGallery = function(games) {
+
+    games.sort(compareCompliance);
+
     for(var i = 0; i < games.length; i++) {
       var link = document.createElement("a");
       link.href = "/play.html?p=" + i;

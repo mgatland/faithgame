@@ -259,6 +259,7 @@ function stateToString(){
   state.hyperlinks=hyperlinks;
   state.colorPalette = colorPalette;
   state.frameData=frameData;
+  state.compliance = updateReflection();
   var result=JSON.stringify(state);
   return result;
 }
@@ -603,6 +604,7 @@ function clearPalette(){
         complianceScore+=score;
       }
       console.log("compliance score is " + complianceScore);
+      return complianceScore;
     }
 
     function setLayer(newCanvasIndex) {

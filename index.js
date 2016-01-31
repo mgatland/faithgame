@@ -14,7 +14,10 @@ var deleteFromDatabase = saveToDatabase;
 
 var addGame = function(game) {
 	games.push(game);
-	gameSummaries.push({thumbnail:game.canvasses[0], colorPalette:game.colorPalette, id:game._id});
+	if (game.compliance == undefined) {
+		game.compliance = 1;
+	}
+	gameSummaries.push({thumbnail:game.canvasses[0], colorPalette:game.colorPalette, id:game._id, compliance: game.compliance});
 }
 
 app.use("/", express.static(__dirname + '/'));
