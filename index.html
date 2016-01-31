@@ -70,7 +70,7 @@
 
   var colorElem = new Array();
     var layerElem = new Array();
-  var colorIndex=getRandomInt(1,4);
+  var initialColor=colorIndex=getRandomInt(1,4);
 
 var aurl = document.createElement('a');
 function qualifyURL(url) {
@@ -279,6 +279,7 @@ function stateToString(){
   }
   state.hyperlinks=hyperlinks;
   state.colorPalette = colorPalette;
+  state.initialColor=initialColor;
   state.frameData=frameData;
   state.compliance = updateReflection();
   var result=JSON.stringify(state);
@@ -524,10 +525,17 @@ function clearPalette(){
       var complianceScore = 0.0;
       var frameInQuestion=0;
       // NOTE: frame 1
-      if (frameData[frameInQuestion].strokesCount==1) {
-        complianceScore+=1.0;
-      } else {
-        // zero points
+      {
+        if (frameData[frameInQuestion].strokesCount==1) {
+          complianceScore+=0.5;
+        } else {
+          // zero points
+        }
+        if (frameData[frameInQuestion].initialStrokeColor==initialColor) {
+          complianceScore+=0.5;
+        } else {
+          // zero points
+        }
       }
       ++frameInQuestion;
       // NOTE: frame 2
@@ -586,6 +594,7 @@ function clearPalette(){
       complianceScore+=similarity;
       ++frameInQuestion;
       // NOTE: frame 7
+      
       if (frameData[frameInQuestion].strokesCount==0 &&
           frameData[frameInQuestion].fillsCount==0) {
         complianceScore+=1.0;
@@ -706,7 +715,7 @@ function clearPalette(){
       }
 
       for (var i=0; i<numFrames; ++i){
-        frameData[i]={strokesCount: 0, fillsCount: 0, hasBeenOpened: false};
+        frameData[i]={strokesCount: 0, fillsCount: 0, hasBeenOpened: false, initialStrokeColor: -1};
       }
 
       visibleCanvas = document.getElementById("mainCanvas");
@@ -1027,23 +1036,34 @@ function clearPalette(){
 
     var canvas=canvasses[canvasIndex];
 
-    var points;
-    if (lastX===-1) {
-      points=[[x,y]];
-    } else {
-      points=line(x,y,lastX,lastY);
-    }
-
-    for (var i=0;i<points.length;i++){
-      var p=points[i];
-
-      if (radius>0){
-        drawCircle(canvas,p[0],p[1],radius,colorIndex);
-      } else {
-        floodFill(canvas, p[0], p[1], colorIndex);
-
-        ++frameData[canvasIndex].fillsCount;
+    if (radius>0){
+      if (frameData[canvasIndex].strokesCount==0) {
+        frameData[canvasIndex].initialStrokeColor=colorIndex;
       }
+
+      var points;
+      if (lastX===-1) {
+        points=[[x,y]];
+      } else {
+        points=line(x,y,lastX,lastY);
+      }
+
+      for (var i=0;i<points.length;i++){
+        var p=points[i];
+
+        drawCircle(canvas,p[0],p[1],radius,colorIndex);
+      }
+    } else {
+      var p=[x,y];
+      if (lastX===-1) {
+        // nothin
+      } else {
+        p=[lastX,lastY];
+      }
+
+      floodFill(canvas, p[0], p[1], colorIndex);
+
+      ++frameData[canvasIndex].fillsCount;
     }
   
 
@@ -1131,7 +1151,7 @@ function clearPalette(){
     // }
   }
 
-  function drawCircle(canvas,x,y,radius,colorIndex){  
+  function drawCircle(canvas,x,y,radius,colorIndex){
     radius=Math.floor(radius/2)+1;
     if (radius==1){
       var idx=Math.max(0, Math.min(width-1, x))+width*Math.min(height-1, y);
