@@ -1000,8 +1000,8 @@ function clearPalette(){
 
     var coords = getCoords(e);
 
-    var x = Math.round(-1+coords[0]/zoomFactor);
-    var y = Math.round(-1+coords[1]/zoomFactor);
+    var x = Math.floor(-1+coords[0]/zoomFactor);
+    var y = Math.floor(-1+coords[1]/zoomFactor);
 
 
     var canvas=canvasses[canvasIndex];
