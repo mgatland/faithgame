@@ -83,11 +83,15 @@
 
   var drawGallery = function(games) {
 
+    for(var i = 0; i < games.length; i++) {
+      games[i].link = i;
+    }
+
     games.sort(compareCompliance);
 
     for(var i = 0; i < games.length; i++) {
       var link = document.createElement("a");
-      link.href = "/play.html?p=" + i;
+      link.href = "/play.html?p=" + games[i].link;
 
       var pixels = RLE_decode(games[i].thumbnail);
       var colorPalette = games[i].colorPalette;
