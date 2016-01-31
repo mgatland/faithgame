@@ -445,6 +445,8 @@ function clearPalette(){
     } else {
       hyperlinks[canvasIndex][dropdown-1]=valNumber;
     }
+
+    updateAllowedToPublish();
   }
 
     function setColor(newColorIndex) {
@@ -463,6 +465,18 @@ function clearPalette(){
         if (frameData[i].hasBeenOpened == true) count++;
       }
       return count;
+    }
+
+    function linksOut(pageIndex) {
+      var result=false;
+      for (var linkIndex=0; linkIndex<numColors; ++linkIndex) {
+        var linksTo=hyperlinks[pageIndex][linkIndex];
+        if (linksTo!=0) {
+          result=true;
+          break;
+        }
+      }
+      return result;
     }
 
     function downsample(canvas, compareBlockCount, downsampledResult) {
@@ -567,12 +581,12 @@ function clearPalette(){
         for (var linkUsageIndex=0; linkUsageIndex<numFrames; ++linkUsageIndex) {
           linkUsage[linkUsageIndex]=0;
         }
-        for (var linkIndex=1; linkIndex<numColors; ++linkIndex) {
+        for (var linkIndex=0; linkIndex<numColors; ++linkIndex) {
           var linksTo=hyperlinks[frameInQuestion][linkIndex];
           ++linkUsage[linksTo];
         }
         var usedLinks=0;
-        for (var linkIndex=0; linkIndex<numColors; ++linkIndex) {
+        for (var linkIndex=1; linkIndex<numColors; ++linkIndex) {
           if (linkUsage[linkIndex]>0) {
             ++usedLinks;
           }
@@ -643,6 +657,24 @@ function clearPalette(){
       return complianceScore;
     }
 
+    function updateAllowedToPublish() {
+      if (numberOfPagesOpened() >= 9) {
+        var numPagesWithLinks=0;
+        for (var frameIndex=0; frameIndex<numFrames;++frameIndex) {
+          if (linksOut(frameIndex)) {
+            ++numPagesWithLinks;
+          } else {
+          }
+        }
+        document.getElementById("shareButton").style.display = "";
+        if (numPagesWithLinks>2) {
+          document.getElementById("linkTip").style.display = "none";
+        } else {
+          document.getElementById("linkTip").style.display = "";
+        }
+      }
+    }
+
     function setLayer(newCanvasIndex) {
       document.getElementById("message").innerHTML = messages[newCanvasIndex - 1];
       frameData[newCanvasIndex - 1].hasBeenOpened = true;
@@ -658,9 +690,8 @@ function clearPalette(){
           dropdownOption[i].value=hyperlinks[canvasIndex][i];
         }
         updateTimeDisplay();
-        if (numberOfPagesOpened() >= 9) {
-          document.getElementById("shareButton").style.display = "";
-        }
+
+        updateAllowedToPublish();
 
         if (timers[canvasIndex] > 0) {
           visibleCanvas.style.cursor="crosshair";
@@ -671,7 +702,6 @@ function clearPalette(){
 
     function init() {
 
-          
       radii = new Array();
       for (var i=0;i<16;i++){
         elem = document.getElementById("radius_"+(i+1));
@@ -1668,7 +1698,9 @@ body {
                             </td>                           
                           </tr>
                         </table>
-                      <a href="#" onclick="shareClick();return false;" style="display:none" class="button" id="shareButton">&ocir; it is done</a><br />
+                      <div style="display:none" class="importantTip" id="linkTip">the colors on each page can be made to link to another page using the boxes above</div>
+                      <a href="#" onclick="shareClick();return false;" style="display:none" class="button" id="shareButton">&ocir; it is done</a>
+                      <br />
                       <div id="shareLink"></div>
                       
                       <div class="secret">
