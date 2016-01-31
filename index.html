@@ -416,7 +416,13 @@ function clearPalette(){
 
 
   function dropDownSelect(dropdown,val) {
-    hyperlinks[canvasIndex][dropdown-1]=val;
+    var valNumber=parseInt(val,10);
+    if (isNaN(valNumber)) {
+      console.log("dropdown value was NaN");
+      hyperlinks[canvasIndex][dropdown-1]=val;
+    } else {
+      hyperlinks[canvasIndex][dropdown-1]=valNumber;
+    }
   }
 
     function setColor(newColorIndex) {
@@ -581,7 +587,7 @@ function clearPalette(){
           if (frameIndex!=frameInQuestion) {
             for (var linkIndex=0; linkIndex<numColors; ++linkIndex) {
               var linksTo=hyperlinks[frameIndex][linkIndex];
-              if (linksTo==frameInQuestion) {
+              if (linksTo==1+frameInQuestion) {
                 score-=1.0;
                 break;
               }
