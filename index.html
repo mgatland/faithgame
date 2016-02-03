@@ -648,10 +648,10 @@ function clearPalette(){
       {
         var score=1.0;
         for (var linkIndex=0; linkIndex<numColors; ++linkIndex) {
-          var linksTo=hyperlinks[8][linkIndex];
-          score-=linksTo;
+          if (hyperlinks[9][linkIndex]) {
+            score = 0;
+          };
         }
-        score=Math.min(1.0, Math.max(0.0, score));
         complianceScore+=score;
       }
       console.log("compliance score is " + complianceScore);
