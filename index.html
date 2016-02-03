@@ -579,7 +579,7 @@ function clearPalette(){
       // NOTE: frame 4
       {
         var linkUsage=[];
-        for (var linkUsageIndex=0; linkUsageIndex<numFrames; ++linkUsageIndex) {
+        for (var linkUsageIndex=0; linkUsageIndex<=numFrames; ++linkUsageIndex) {
           linkUsage[linkUsageIndex]=0;
         }
         for (var linkIndex=0; linkIndex<numColors; ++linkIndex) {
@@ -587,7 +587,7 @@ function clearPalette(){
           ++linkUsage[linksTo];
         }
         var usedLinks=0;
-        for (var linkIndex=1; linkIndex<numColors; ++linkIndex) {
+        for (var linkIndex=1; linkIndex<=numFrames; ++linkIndex) {
           if (linkUsage[linkIndex]>0) {
             ++usedLinks;
           }
