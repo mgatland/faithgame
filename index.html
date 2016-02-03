@@ -652,6 +652,10 @@ function clearPalette(){
             score = 0;
           };
         }
+        //did they draw something (maybe a circle)
+        if (frameData[frameInQuestion].strokesCount > 0) {
+          score += 1;
+        }
         complianceScore+=score;
       }
       console.log("compliance score is " + complianceScore);
