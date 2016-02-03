@@ -1,7 +1,6 @@
-http://www.flickgame.org
+http://faithgame.herokuapp.com/
 
-tiny game engine with online sharing as well as standalone export.
-
+faithgame is a fork of flickgame (http://www.flickgame.org)
 
 The MIT License (MIT)
 

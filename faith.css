@@ -1,0 +1,35 @@
+body {
+ background-color:black;
+ color: white;
+ margin-top: 0;
+ padding-top: 0;
+ border-top: 0;
+ font-size:22px;
+}
+h2 {
+	font-size: 32px; 
+}
+.gallery canvas {
+  border: 1px solid black;
+  margin:5px;
+  display:inline-block;
+}
+.gallery canvas:hover {
+  border: 1px solid white;
+}
+.gallery {
+  margin: auto;
+  max-width: 1024px;
+}
+a {
+   color: white;
+   text-decoration: none;
+}
+.id {
+  display: inline-block;
+  font-size: 12px;
+  margin-right: 20px;
+}
+.normal .id, .normal .leadership {
+  display: none;
+}
