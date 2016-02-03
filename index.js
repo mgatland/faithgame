@@ -5,7 +5,7 @@ var express = require("express");
 var bodyParser = require('body-parser')
 var app = express();
 var port = process.env.PORT || 8080;
-
+var compliance = require('./compliance.js');
 var games = [];
 var gameSummaries = [];
 
@@ -13,10 +13,8 @@ var saveToDatabase = function () {console.log("no database");};
 var deleteFromDatabase = saveToDatabase;
 
 var addGame = function(game) {
+	game.compliance = compliance.update(game);
 	games.push(game);
-	if (game.compliance == undefined) {
-		game.compliance = 1;
-	}
 	gameSummaries.push({thumbnail:game.canvasses[0], colorPalette:game.colorPalette, id:game._id, compliance: game.compliance});
 }
 
