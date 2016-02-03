@@ -64,7 +64,17 @@ body {
 
     games.sort(compareCompliance);
 
+    var trueGallery = document.querySelector(".g1");
+    var falseGallery = document.querySelector(".g2");
+
+    var gallery = trueGallery;
+
     for(var i = 0; i < games.length; i++) {
+
+      if (games[i].compliance < 4.5) {
+        gallery = falseGallery;
+      }
+
       var link = document.createElement("a");
       link.href = "/play.html?p=" + games[i].link;
 
@@ -73,7 +83,7 @@ body {
       var canvas = drawThumbnail(pixels, colorPalette);
       link.appendChild(canvas);
 
-      document.querySelector(".gallery").appendChild(link);
+      gallery.appendChild(link);
 
       var id = document.createElement("a");
       id.className += " id";
@@ -82,7 +92,7 @@ body {
       id.gameId = gameId;
       id.onclick = function () {removeGame(this.gameId); return false;}
       id.innerHTML += "delete";
-      document.querySelector(".gallery").appendChild(id);
+      gallery.appendChild(id);
     }
   }
 
