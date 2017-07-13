@@ -19,7 +19,10 @@ var addGame = function(game) {
 }
 
 app.use("/", express.static(__dirname + '/'));
-app.use(bodyParser());
+
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
 app.post('/newgame', function(req, res){
     console.log("new game saved");
     var data = JSON.parse(req.body.file);
@@ -50,6 +53,7 @@ app.get("/game", function(req, res){
 	res.send(games[req.query.id]);
 });
 
+console.log("Listening at port " + port)
 app.listen(port);
 
 var mongodb = require('mongodb');
