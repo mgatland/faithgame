@@ -461,9 +461,6 @@ function press(evt){
   }
 
   function createLink(color, destination) {
-    if (destination == canvasIndex + 1) {
-      destination = 0; //prevent self-links
-    }
     hyperlinks[canvasIndex][color]=destination;
     updateLinkDisplays();
     updateAllowedToPublish();
@@ -553,7 +550,7 @@ function press(evt){
     function updateLinkPopover() {
       var i = 1;
       for (el of linkPageSelectorNumberElems) {
-        el.innerHTML = (i==canvasIndex+1) ? "--" : i;
+        el.innerHTML = i;
         i++;
       }
     }
@@ -629,6 +626,17 @@ function press(evt){
           hideLinkPopover();
         }
       });
+
+      var wrapper = document.createElement("div");
+      wrapper.innerHTML = `<a class="button" href="#">no link</a>`;
+      var popOverRemoveLinkElem = wrapper.firstChild;
+      linksPopOverElem.appendChild(popOverRemoveLinkElem);
+
+      popOverRemoveLinkElem.addEventListener("click", function (e) {
+        createLink(linksPopOverColor, 0);
+        hideLinkPopover();
+      })
+          
       //discard the unwanted popover if the user clicks on anything else
       document.body.addEventListener("click", function (e) {
         if (e.target != visibleCanvas 
@@ -1283,6 +1291,9 @@ function press(evt){
   border:2px solid gray;
   background-color:black;  
 }
+.pageSelector:hover {
+  border: 2px solid white;
+}
 
 .linksPopOver {
   position: absolute;
@@ -1307,7 +1318,7 @@ function press(evt){
 .linkPageSelector {
   display: inline-block;
   width: 60px;
-  height: 70px;
+  height: 50px;
 }
 .linkDisplay {
   text-align: center;
