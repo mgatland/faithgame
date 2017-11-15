@@ -1294,6 +1294,7 @@ function press(evt){
   background-color: black;
   text-align: center;
   padding: 5px;
+  font-size: 22px;
 }
 .colorDisplay {
   display: inline-block;
@@ -1311,6 +1312,12 @@ function press(evt){
 .linkDisplay {
   text-align: center;
   width: 100%; /*it's in a table cell*/
+}
+
+.colorPicker {
+  border:2px solid gray;
+  margin-top:2px;
+  font-size: 20px;
 }
 
 .hidden {
@@ -1331,9 +1338,6 @@ body {
                 canvas {
                   position:relative;
                 }
-                 ul {
-                 list-style-type: none;
-                 }
                  input {
                  background-color: black;
                  color:white;
@@ -1342,7 +1346,6 @@ body {
                  margin-bottom: 5px;
                  }
                  li {
-                 font-size: 150%;                 
                   width:100%;
                  }
                  a.layerItem{
@@ -1371,13 +1374,13 @@ body {
                   white-space:nowrap;
                 }
                  div.selected {
-                 height:30px; 
-                 width:30px;
+                 height:20px; 
+                 width:40px;
                  border: 2px solid red;
                  }
                  div.unselected {
-                 height:30px; 
-                 width:30px;
+                 height:20px; 
+                 width:40px;
                  border: 2px solid black;
                  }
                  img.radius {
@@ -1405,7 +1408,12 @@ body {
                   background-color:black;
                  }
                  ul {
+                  list-style-type: none;
                   padding:0;
+                  padding-top: 90px;
+                 }
+                 table {
+                  font-size: 22px;
                  }
     /*]]>*/
     </style>
@@ -1439,10 +1447,6 @@ body {
     <table cellpadding="10">
       <tr>
         <td valign="top" style="padding-right: 0;">
-          <br />
-          <br />
-          <br />
-          <br />
           <ul>
             <li> 
               <a class="layerItem selectedItem" id="layerItem1" href="#" onclick="setLayer(1);return false;">
@@ -1517,7 +1521,7 @@ body {
                         <div id="message"></div>
                         <canvas id="mainCanvas" width="600" height="600" style="border:2px solid gray; background-color:black;"></canvas>
                         <br />
-                        <table style="border:2px solid gray; margin-top:2px" margin="0">
+                        <table class="colorPicker" margin="0">
                           <tr height="16">
                             <td style="text-align:right">
                             color
@@ -1545,7 +1549,7 @@ body {
                           </tr>
                           <tr id="linkDisplayContainer">
                             <td>
-                            links to
+                            <div style="margin-left: 5px; margin-top:-19px; text-align:right">links to</div>
                             </td>
                             <td>
                               <div id="col1"></div>
@@ -1574,12 +1578,7 @@ body {
                       </div>
                       </center>
                     </td>
-                    <td valign="top" id="brushes">
-                      <br />
-                      <br />
-                      <br />
-                      <br />
-                      <br />
+                    <td valign="top" id="brushes" style="padding-top:90px;">
                       <a href="#" onclick="setRadius(16);return false;"><img src="16.png" class="radius" id="radius_16" /></a>
                       <br />
                       <a href="#" onclick="setRadius(13);return false;"><img src="13.png" class="radius" id="radius_13" /></a>
