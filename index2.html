@@ -19,6 +19,7 @@
   var finished = false;
   var frameData = new Array();
 
+  var preventLinksAfterTimerExpires = false;
   var shareLinkInner=null;
 
   //http://stackoverflow.com/questions/1484506/random-color-generator-in-javascript
@@ -30,7 +31,6 @@
       }
       return color;
   }
-
 
   function getCookie(name) {
     var value = "; " + document.cookie;
@@ -659,7 +659,7 @@ function press(evt){
 
       linkDisplayContainer = document.querySelector("#linkDisplayContainer")
       linkDisplayContainer.addEventListener("click", function (e) {
-        if (timers[canvasIndex] <= 0) return;
+        if (preventLinksAfterTimerExpires && timers[canvasIndex] <= 0) return;
         if (e.target.tagName.toLowerCase() === 'canvas') {
           var i = Array.from(linkDisplayContainer.querySelectorAll("canvas")).indexOf(e.target);
           showLinkPopover({x: e.pageX, y:e.pageY-40}, i, true);
@@ -1013,8 +1013,12 @@ function press(evt){
     e = e || window.event;
 
     if (timers[canvasIndex] <= 0) {
-      visibleCanvas.style.cursor="not-allowed";
-      hideLinkPopover();
+      if (!linkMode || preventLinksAfterTimerExpires) {
+        visibleCanvas.style.cursor="not-allowed";
+        hideLinkPopover();
+      } else {
+        visibleCanvas.style.cursor="crosshair";
+      }
       return;
     }
 
