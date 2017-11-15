@@ -85,9 +85,15 @@ var begin = function () {
 }
 
 var radiusElem = new Array();
-  var thumbnailCanvas = new Array();
-  var thumbnailContext = new Array();
-  var dropdownOption = new Array();
+var thumbnailCanvas = new Array();
+var thumbnailContext = new Array();
+var linkThumbnailCanvas = new Array();
+var linkThumbnailContext = new Array();
+var linkDisplayElems = new Array();
+var linkDisplayContainer;
+var linksPopOverElem;
+var linksPopOverColor;
+var linkPageSelectorNumberElems = new Array();
 
 var standalone_HTML_String="";
 
@@ -397,6 +403,7 @@ function press(evt){
   var height=100;
   var zoomFactor=6;
   var radius=5;
+  var linkMode=false;
 
   var visibleCanvas;
   var visibleContext;
@@ -407,45 +414,58 @@ function press(evt){
   var lastY=-1;
 
   var bucketElem;
+  var linkToolElem;
 
   function linkChange(newLink){
     gameLink=newLink;
   }
 
-function clearPalette(){
-  preserveUndoState();
-  var canvas=canvasses[canvasIndex];
-  for (var i=0;i<width*height;i++){
-    canvas[i]=0;
+  function clearPalette(){
+    preserveUndoState();
+    var canvas=canvasses[canvasIndex];
+    for (var i=0;i<width*height;i++){
+      canvas[i]=0;
+    }
+
+    setVisuals();
   }
 
-  setVisuals();
-}
-    function setRadius(newRadius) {
-        radius=newRadius;
-        bucketElem.setAttribute("class","radius");
-        for(var i=0;i<16;i++){
-          if (radiusElem[i]!==null){
-            radiusElem[i].setAttribute("class","radius");
-          }
-        }
-        if (newRadius>0){
-          radiusElem[newRadius-1].setAttribute("class","radius selected");
-        } else {
-          bucketElem.setAttribute("class","radius selected");
-        }
+  function deselectDrawingTools() {
+    //reset border around other tools
+    bucketElem.classList.remove("selected");
+    linkToolElem.classList.remove("selected");
+    for(var i=0;i<16;i++){
+      if (radiusElem[i]!==null){
+        radiusElem[i].classList.remove("selected");
+      }
     }
+  }
 
+  function setRadius(newRadius) {
+      linkMode = false;
+      hideLinkPopover();
+      radius=newRadius;
+      deselectDrawingTools();
+      if (newRadius>0){
+        radiusElem[newRadius-1].classList.add("selected");
+      } else {
+        bucketElem.classList.add("selected");
+      }
+  }
 
-  function dropDownSelect(dropdown,val) {
-    var valNumber=parseInt(val,10);
-    if (isNaN(valNumber)) {
-      console.log("dropdown value was NaN");
-      hyperlinks[canvasIndex][dropdown-1]=val;
-    } else {
-      hyperlinks[canvasIndex][dropdown-1]=valNumber;
+  function setLinkTool() {
+    deselectDrawingTools();
+    linkToolElem.classList.add("selected");
+    linkMode = true;
+    hideLinkPopover();
+  }
+
+  function createLink(color, destination) {
+    if (destination == canvasIndex + 1) {
+      destination = 0; //prevent self-links
     }
-
+    hyperlinks[canvasIndex][color]=destination;
+    updateLinkDisplays();
     updateAllowedToPublish();
   }
 
@@ -501,23 +521,64 @@ function clearPalette(){
       document.getElementById("message").innerHTML = messages[newCanvasIndex - 1];
       frameData[newCanvasIndex - 1].hasBeenOpened = true;
       canvasIndex=newCanvasIndex-1;
-        for(var i=0;i<numFrames;i++){
-          if (layerElem[i]!==null){
-            layerElem[i].setAttribute("class","layerItem");
-          }
-        }
-        layerElem[canvasIndex].setAttribute("class","layerItem selectedItem");
-        setVisuals();
-        for(var i=0;i<numColors;i++){
-          dropdownOption[i].value=hyperlinks[canvasIndex][i];
-        }
-        updateTimeDisplay();
+      layerElem.forEach(el => el.classList.remove("selectedItem"));
+      layerElem[canvasIndex].classList.add("selectedItem");
+      setVisuals();
+      updateLinkDisplays();
+      updateTimeDisplay();
 
-        updateAllowedToPublish();
+      updateAllowedToPublish();
 
-        if (timers[canvasIndex] > 0) {
-          visibleCanvas.style.cursor="crosshair";
+      if (timers[canvasIndex] > 0) {
+        visibleCanvas.style.cursor="crosshair";
+      }
+      updateLinkPopover();
+      hideLinkPopover();
+    }
+
+    function updateLinkDisplays() {
+      for(var i=0;i<numColors;i++){
+        var linkTo = hyperlinks[canvasIndex][i];
+        var textEl = linkDisplayElems[i].querySelector(".linkPageSelectorNumber");
+        textEl.innerHTML = linkTo || "--";
+        var ctx = linkDisplayElems[i].querySelector("canvas").getContext("2d");
+        if (linkTo > 0) {
+          ctx.drawImage(thumbnailCanvas[linkTo-1], 0, 0);
+        } else {
+          ctx.clearRect(0, 0, thumbnailCanvas[0].width, thumbnailCanvas[0].height);
         }
+      }
+    }
+
+    function updateLinkPopover() {
+      var i = 1;
+      for (el of linkPageSelectorNumberElems) {
+        el.innerHTML = (i==canvasIndex+1) ? "--" : i;
+        i++;
+      }
+    }
+
+    function showLinkPopover (coords, color, forceUpwards) {
+      linksPopOverColor = color;
+      linksPopOverElem.querySelector(".colorDisplay").style.backgroundColor=colorPalette[color];
+      linksPopOverElem.classList.remove("hidden");
+      var popoverHeight = linksPopOverElem.clientHeight;
+      if (forceUpwards || coords.y + popoverHeight + 25 >= document.body.scrollHeight) {
+        coords.y -= (popoverHeight + 20);
+      } else {
+        coords.y += 20;
+      }
+      coords.x -= linksPopOverElem.clientWidth / 2;
+      if (coords.x < 5) coords.x = 5;
+      if(coords.x + linksPopOverElem.clientWidth > document.body.scrollWidth - 5) {
+        coords.x = document.body.scrollWidth - 5 - linksPopOverElem.clientWidth;
+      } 
+      linksPopOverElem.style.top = (coords.y) + "px";
+      linksPopOverElem.style.left = (coords.x) + "px";
+    }
+
+    function hideLinkPopover() {
+     linksPopOverElem.classList.add("hidden"); 
     }
 
     function init() {
@@ -529,17 +590,67 @@ function clearPalette(){
         
       }
 
+      linksPopOverElem = document.querySelector(".linksPopOver");
+
       for (var i=0;i<numFrames;i++){
         elem = document.getElementById("thumbnail"+(i+1));
         elem.width=thumbSize;
         elem.height=thumbSize;
         thumbnailCanvas[i]=elem;
         thumbnailContext[i]=elem.getContext("2d");
+
+        var wrapper = document.createElement("div");
+        wrapper.innerHTML = 
+        `<div class="linkPageSelector">
+          <canvas width="20" height="20" 
+          class="pageSelector linkThumbnail${i+1}"></canvas>
+          <div class="linkPageSelectorNumber">${i+1}</div>
+        </div>
+        `
+        var popOverPageSelectorElem = wrapper.firstChild;
+        linksPopOverElem.appendChild(popOverPageSelectorElem);
+        linkThumbnailCanvas[i]=popOverPageSelectorElem.querySelector("canvas");
+        linkThumbnailContext[i]=linkThumbnailCanvas[i].getContext("2d");
       }
+
+      linkPageSelectorNumberElems = linksPopOverElem.querySelectorAll(".linkPageSelectorNumber");
+
+      linksPopOverElem.addEventListener("click", function (e) {
+        if (e.target.tagName.toLowerCase() === 'canvas') {
+          var i = linkThumbnailCanvas.indexOf(e.target) + 1;
+          createLink(linksPopOverColor, i);
+          hideLinkPopover();
+        }
+      });
+      //discard the unwanted popover
+      document.body.addEventListener("click", function (e) {
+        var targetTag = e.target.tagName.toLowerCase();
+        if (targetTag === "body" || targetTag === 'center' 
+          || targetTag === "table" || targetTag === "tbody"
+          || targetTag === "tr" || targetTag === "td") {
+          hideLinkPopover();
+        }
+      })
+
       for (var i=0;i<4;i++){
         elem = document.getElementById("col"+(i+1));
-        dropdownOption[i] = elem;        
+        linkDisplayElems[i] = elem;
+        elem.innerHTML =
+        `<div class="linkDisplay">
+          <canvas width="20" height="20" 
+          class="pageSelector"></canvas>
+          <div class="linkPageSelectorNumber">--</div>
+        </div>`;    
       }
+
+      linkDisplayContainer = document.querySelector("#linkDisplayContainer")
+      linkDisplayContainer.addEventListener("click", function (e) {
+        if (timers[canvasIndex] <= 0) return;
+        if (e.target.tagName.toLowerCase() === 'canvas') {
+          var i = Array.from(linkDisplayContainer.querySelectorAll("canvas")).indexOf(e.target);
+          showLinkPopover({x: e.pageX, y:e.pageY-40}, i, true);
+        }
+      });
 
       for (var i=0;i<4;i++){
         elem = document.getElementById("color_"+(i));        
@@ -554,6 +665,7 @@ function clearPalette(){
 
 
       bucketElem=document.getElementById("bucket");
+      linkToolElem=document.getElementById("linkTool");
 
 
       for (var i=0;i<numFrames;i++){
@@ -589,6 +701,7 @@ function clearPalette(){
 
       getData();
       updateTimeDisplay();
+      updateLinkPopover();
 
       if (location.search === "?leadership") {
         document.querySelector("body").className += " leadership";
@@ -715,8 +828,9 @@ function clearPalette(){
         }
       }
 
-      //var dataUrl = thumbnailCanvas[n].toDataURL();
-      //dropdownOption[0][1].style.backgroundImage="url("+dataUrl+")";
+      //copy image to the link tool thumbnail too
+      var linkThumbCtx =linkThumbnailContext[n];
+      linkThumbCtx.drawImage(thumbnailCanvas[n], 0, 0);
     }
 
     function setVisuals(genAllThumbnails){
@@ -800,9 +914,19 @@ function clearPalette(){
 
     if (timers[canvasIndex] <= 0 || finished) return;
     e = e || window.event;
+    var coords = getCoords(e);
+
+    if (linkMode) {
+      var coords = getCoords(e);
+      var canvasX = Math.round(-1+coords[0]/zoomFactor);
+      var canvasY = Math.round(-1+coords[1]/zoomFactor);
+      var originColor = canvas[canvasX+width*canvasY];
+      showLinkPopover({x: e.pageX, y:e.pageY}, originColor);
+      return;
+    }
 
     drawing=1;
-    var coords = getCoords(e);
+    
     startTargetX=coords[0];
     startTargetY=coords[1];
     lastX=Math.round(-1+startTargetX/zoomFactor);
@@ -865,13 +989,12 @@ function clearPalette(){
     return coordinatesArray;
   }
 
-
   function mouseMove(e){
     e = e || window.event;
 
     if (timers[canvasIndex] <= 0) {
       visibleCanvas.style.cursor="not-allowed";
-
+      hideLinkPopover();
       return;
     }
 
@@ -1127,10 +1250,6 @@ function clearPalette(){
   border-color: grey;
 }
 
-.hidden {
-  display: none;
-}
-
 #instructions {
   position: absolute;
   width: 99%;
@@ -1146,6 +1265,44 @@ function clearPalette(){
 
 .leadership .secret {
   display: inherit;
+}
+
+.pageSelector {
+  border:2px solid gray;
+  background-color:black;  
+}
+
+.linksPopOver {
+  position: absolute;
+  display: block;
+  border: 2px solid grey;
+  top: 200px;
+  width:300px;
+  left: calc(50% - 150px);
+  background-color: black;
+  text-align: center;
+  padding: 5px;
+}
+.colorDisplay {
+  display: inline-block;
+  border: 2px solid grey;
+  width: 30px;
+  height: 30px;
+  vertical-align: middle;
+  border-radius: 50%;
+}
+.linkPageSelector {
+  display: inline-block;
+  width: 60px;
+  height: 70px;
+}
+.linkDisplay {
+  text-align: center;
+  width: 100%; /*it's in a table cell*/
+}
+
+.hidden {
+  display: none;
 }
 
 body {
@@ -1196,20 +1353,26 @@ body {
                   white-space:nowrap;
                 }
                  div.selected {
-                 height:16px; 
+                 height:30px; 
                  width:30px;
                  border: 2px solid red;
                  }
                  div.unselected {
-                 height:16px; 
+                 height:30px; 
                  width:30px;
                  border: 2px solid black;
                  }
                  img.radius {
                   border: 1px solid transparent;
                  }
-                 img.selected {
+                 img.selected, a.selected {
                   border: 1px solid red; 
+                 }
+                 .textButton {
+                   display: block;
+                   text-align:center;
+                   border: 1px solid white;
+                   font-size: 32px;
                  }
                  select {
                  width:100%;
@@ -1263,61 +1426,61 @@ body {
             <li> 
               <a class="layerItem selectedItem" id="layerItem1" href="#" onclick="setLayer(1);return false;">
               <div class="timer" id="thumbTimer1"></div>
-              <canvas id="thumbnail1" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail1" width="10" height="10" class="pageSelector"></canvas>
               1</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem2" href="#" onclick="setLayer(2);return false;">
               <div class="timer" id="thumbTimer2"></div>
-              <canvas id="thumbnail2" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail2" width="10" height="10" class="pageSelector"></canvas>
               2</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem3" href="#" onclick="setLayer(3);return false;">
               <div class="timer" id="thumbTimer3"></div>
-              <canvas id="thumbnail3" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail3" width="10" height="10" class="pageSelector"></canvas>
               3</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem4" href="#" onclick="setLayer(4);return false;">
               <div class="timer" id="thumbTimer4"></div>
-              <canvas id="thumbnail4" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail4" width="10" height="10" class="pageSelector"></canvas>
               4</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem5" href="#" onclick="setLayer(5);return false;">
               <div class="timer" id="thumbTimer5"></div>
-              <canvas id="thumbnail5" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail5" width="10" height="10" class="pageSelector"></canvas>
               5</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem6" href="#" onclick="setLayer(6);return false;">
               <div class="timer" id="thumbTimer6"></div>
-              <canvas id="thumbnail6" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail6" width="10" height="10" class="pageSelector"></canvas>
               6</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem7" href="#" onclick="setLayer(7);return false;">
               <div class="timer" id="thumbTimer7"></div>
-              <canvas id="thumbnail7" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail7" width="10" height="10" class="pageSelector"></canvas>
               7</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem8" href="#" onclick="setLayer(8);return false;">
               <div class="timer" id="thumbTimer8"></div>
-              <canvas id="thumbnail8" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail8" width="10" height="10" class="pageSelector"></canvas>
               8</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem9" href="#" onclick="setLayer(9);return false;">
               <div class="timer" id="thumbTimer9"></div>
-              <canvas id="thumbnail9" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail9" width="10" height="10" class="pageSelector"></canvas>
               9</a>
             </li>
             <li> 
               <a class="layerItem" id="layerItem10" href="#" onclick="setLayer(10);return false;">
               <div class="timer" id="thumbTimer10"></div>
-              <canvas id="thumbnail10" width="10" height="10" style="border:2px solid gray; background-color:black;"></canvas>
+              <canvas id="thumbnail10" width="10" height="10" class="pageSelector"></canvas>
               10</a>
             </li>
           </ul>
@@ -1359,149 +1522,21 @@ body {
                               "unselected" id="color_3"></div></a>
                             </td>
                           </tr>
-                          <tr>
+                          <tr id="linkDisplayContainer">
                             <td>
                             links to
                             </td>
                             <td>
-                              <select id="col1" onchange="dropDownSelect(1,this.value)" >
-                                <option value="0"></option>
-                                <option value="1" id="col1-1" >
-                                  1
-                                </option>
-                                <option value="2" id="col1-2" >
-                                  2
-                                </option>
-                                <option value="3" id="col1-3" >
-                                  3
-                                </option>
-                                <option value="4" id="col1-4" >
-                                  4
-                                </option>
-                                <option value="5" id="col1-5" >
-                                  5
-                                </option>
-                                <option value="6" id="col1-6" >
-                                  6
-                                </option>
-                                <option value="7" id="col1-7" >
-                                  7
-                                </option>
-                                <option value="8" id="col1-8" >
-                                  8
-                                </option>
-                                <option value="9" id="col1-9" >
-                                  9
-                                </option>
-                                <option value="10" id="col1-10"> 
-                                  10
-                                </option>
-                              </select>
+                              <div id="col1"></div>
                             </td>
                             <td>
-                              <select id="col2"  onchange="dropDownSelect(2,this.value)" >
-                                <option value="0" id="col2-0" ></option>
-                                <option value="1" id="col2-1" >
-                                  1
-                                </option>
-                                <option value="2" id="col2-2" >
-                                  2
-                                </option>
-                                <option value="3" id="col2-3" >
-                                  3
-                                </option>
-                                <option value="4" id="col2-4" >
-                                  4
-                                </option>
-                                <option value="5" id="col2-5" >
-                                  5
-                                </option>
-                                <option value="6" id="col2-6" >
-                                  6
-                                </option>
-                                <option value="7" id="col2-7" >
-                                  7
-                                </option>
-                                <option value="8" id="col2-8" >
-                                  8
-                                </option>
-                                <option value="9" id="col2-9" >
-                                  9
-                                </option>
-                                <option value="10" id="col2-10"> 
-                                  10
-                                </option>
-                              </select>
+                              <div id="col2"></div>
                             </td>
                             <td>
-                              <select id="col3" onchange="dropDownSelect(3,this.value)"  >
-                                <option value="0" id="col3-0" ></option>
-                                <option value="1" id="col3-1" >
-                                  1
-                                </option>
-                                <option value="2" id="col3-2" >
-                                  2
-                                </option>
-                                <option value="3" id="col3-3" >
-                                  3
-                                </option>
-                                <option value="4" id="col3-4" >
-                                  4
-                                </option>
-                                <option value="5" id="col3-5" >
-                                  5
-                                </option>
-                                <option value="6" id="col3-6" >
-                                  6
-                                </option>
-                                <option value="7" id="col3-7" >
-                                  7
-                                </option>
-                                <option value="8" id="col3-8" >
-                                  8
-                                </option>
-                                <option value="9" id="col3-9" >
-                                  9
-                                </option>
-                                <option value="10" id="col3-10"> 
-                                  10
-                                </option>
-                              </select>
+                              <div id="col3"></div>
                             </td>
                             <td>
-                              <select id="col4" onchange="dropDownSelect(4,this.value)"  >
-                                <option value="0" id="col4-0" ></option>
-                                <option value="1" id="col4-1" >
-                                  1
-                                </option>
-                                <option value="2" id="col4-2" >
-                                  2
-                                </option>
-                                <option value="3" id="col4-3" >
-                                  3
-                                </option>
-                                <option value="4" id="col4-4" >
-                                  4
-                                </option>
-                                <option value="5" id="col4-5" >
-                                  5
-                                </option>
-                                <option value="6" id="col4-6" >
-                                  6
-                                </option>
-                                <option value="7" id="col4-7" >
-                                  7
-                                </option>
-                                <option value="8" id="col4-8" >
-                                  8
-                                </option>
-                                <option value="9" id="col4-9" >
-                                  9
-                                </option>
-                                <option value="10" id="col4-10"> 
-                                  10
-                                </option>
-                              </select>
+                              <div id="col4"></div>
                             </td>                           
                           </tr>
                         </table>
@@ -1542,6 +1577,8 @@ body {
                       <br />
                       <a href="#" onclick="setRadius(0);return false;"><img src="bucket.png" class="radius" id="bucket"/></a>
                       <br />
+                      <a class="radius textButton" id="linkTool" href="#" onclick="setLinkTool();return false;">↦</a>
+                      <br />
                       <!--we must not abandon our efforts
                       <a href="#" onclick="clearPalette();return false;"><img src="clear.png" class="radius" id="bucket"/></a>-->
                     </td>
@@ -1555,5 +1592,9 @@ body {
       </tr>
     </table>
     </center>
+  <div class="linksPopOver hidden">
+    <p><div class="colorDisplay"></div> players who click on this color will move to another page:</p>
+    <!-- the 10 canvas links will appear-->
+  </div>
   </body>
 </html>
