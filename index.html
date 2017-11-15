@@ -558,17 +558,24 @@ function press(evt){
       }
     }
 
-    function showLinkPopover (coords, color, forceUpwards) {
+    function showLinkPopover (coords, color, offCanvasMode) {
       linksPopOverColor = color;
       linksPopOverElem.querySelector(".colorDisplay").style.backgroundColor=colorPalette[color];
       linksPopOverElem.classList.remove("hidden");
       var popoverHeight = linksPopOverElem.clientHeight;
-      if (forceUpwards || coords.y + popoverHeight + 25 >= document.body.scrollHeight) {
+      if (offCanvasMode) {
+        coords.x -= linksPopOverElem.clientWidth / 2;
         coords.y -= (popoverHeight + 20);
       } else {
-        coords.y += 20;
+        coords.x -= 44;
+        coords.y -= 67;
+        if (coords.y + popoverHeight + 25 >= document.body.scrollHeight) {
+          coords.y -= (popoverHeight + 20);
+        } else {
+          coords.y += 20;
+        }        
       }
-      coords.x -= linksPopOverElem.clientWidth / 2;
+
       if (coords.x < 5) coords.x = 5;
       if(coords.x + linksPopOverElem.clientWidth > document.body.scrollWidth - 5) {
         coords.x = document.body.scrollWidth - 5 - linksPopOverElem.clientWidth;
@@ -622,12 +629,11 @@ function press(evt){
           hideLinkPopover();
         }
       });
-      //discard the unwanted popover
+      //discard the unwanted popover if the user clicks on anything else
       document.body.addEventListener("click", function (e) {
-        var targetTag = e.target.tagName.toLowerCase();
-        if (targetTag === "body" || targetTag === 'center' 
-          || targetTag === "table" || targetTag === "tbody"
-          || targetTag === "tr" || targetTag === "td") {
+        if (e.target != visibleCanvas 
+          && !linksPopOverElem.contains(e.target)
+          && !linkDisplayContainer.contains(e.target)) {
           hideLinkPopover();
         }
       })
@@ -917,11 +923,6 @@ function press(evt){
     var coords = getCoords(e);
 
     if (linkMode) {
-      var coords = getCoords(e);
-      var canvasX = Math.round(-1+coords[0]/zoomFactor);
-      var canvasY = Math.round(-1+coords[1]/zoomFactor);
-      var originColor = canvas[canvasX+width*canvasY];
-      showLinkPopover({x: e.pageX, y:e.pageY}, originColor);
       return;
     }
 
@@ -941,6 +942,17 @@ function press(evt){
 
   function mouseUp(e){
     e = e || window.event;
+
+    if (linkMode == true && e.target == visibleCanvas) {
+      var coords = getCoords(e);
+      var canvasX = Math.round(-1+coords[0]/zoomFactor);
+      var canvasY = Math.round(-1+coords[1]/zoomFactor);
+      var originColor = canvas[canvasX+width*canvasY];
+      showLinkPopover({x: e.pageX, y:e.pageY}, originColor);
+      e.stopPropagation();
+      e.preventDefault();
+      return;
+    }
 
     if (drawing){
       ++frameData[canvasIndex].strokesCount;
@@ -1337,10 +1349,16 @@ body {
                   background-color: clear;
                   width:100%;
                   display:block;
+                  margin-bottom: 5px;
+                  padding-left: 4px;
+                  padding-right: 2px;
                  }
                  a.layerItem.selectedItem{
                   color: black;
                   background-color: white;
+                 }
+                 a.layerItem canvas {
+                  vertical-align: text-top;
                  }
                  img.selected {
                   border: 2px solid red;
@@ -1386,6 +1404,9 @@ body {
                   border:2px solid gray; 
                   background-color:black;
                  }
+                 ul {
+                  padding:0;
+                 }
     /*]]>*/
     </style>
     <title>
@@ -1417,7 +1438,7 @@ body {
     </div>
     <table cellpadding="10">
       <tr>
-        <td valign="top">
+        <td valign="top" style="padding-right: 0;">
           <br />
           <br />
           <br />
