@@ -6,6 +6,7 @@ var bodyParser = require('body-parser')
 var app = express();
 var port = process.env.PORT || 8080;
 var compliance = require('./compliance.js');
+var compression = require('./compression.js');
 var games = [];
 var gameSummaries = [];
 
@@ -15,7 +16,8 @@ var deleteFromDatabase = saveToDatabase;
 var addGame = function(game) {
 	game.compliance = compliance.update(game);
 	games.push(game);
-	gameSummaries.push({thumbnail:game.canvasses[0], colorPalette:game.colorPalette, id:game._id, compliance: game.compliance});
+	var thumbnail = compression.encode(game.canvasses[0]);
+	gameSummaries.push({thumbnail:thumbnail, colorPalette:game.colorPalette, id:game._id, compliance: game.compliance});
 }
 
 app.use("/", express.static(__dirname + '/'));

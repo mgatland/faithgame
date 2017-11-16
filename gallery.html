@@ -23,6 +23,8 @@ body {
       <input value="password" id="pass">
     </div>
   </body>
+  <script src="base64js.min.js"></script>
+  <script src="compression.js"></script>
   <script>
 
   function RLE_decode(encoded) {
@@ -58,28 +60,44 @@ body {
 
   var drawGallery = function(games) {
 
+    if (games.length == 0) {
+      document.querySelector("p").textContent = "the server is overwhelmed, please refresh in a minute";
+      return;
+    }
+
     for(var i = 0; i < games.length; i++) {
       games[i].link = i;
     }
 
     games.sort(compareCompliance);
 
-    var trueGallery = document.querySelector(".g1");
-    var falseGallery = document.querySelector(".g2");
+    var i = 0;
+    var drawFunction = function() {
+      drawGame(games[i]);
+      i++;
+      if (i < games.length) {
+        setTimeout(drawFunction);
+      }
+    }
+    drawFunction();
+  }
 
-    var gallery = trueGallery;
+  var trueGallery = document.querySelector(".g1");
+  var falseGallery = document.querySelector(".g2");
 
-    for(var i = 0; i < games.length; i++) {
-
-      if (games[i].compliance < 5) {
-        gallery = falseGallery;
+  function drawGame(game) {
+      if (game.compliance < 5) {
+        var gallery = falseGallery;
+      } else {
+        gallery = trueGallery;
       }
 
       var link = document.createElement("a");
-      link.href = "/play.html?p=" + games[i].link;
+      link.href = "/play.html?p=" + game.link;
 
-      var pixels = RLE_decode(games[i].thumbnail);
-      var colorPalette = games[i].colorPalette;
+      var rle = compression.decode(game.thumbnail);
+      var pixels = RLE_decode(rle);
+      var colorPalette = game.colorPalette;
       var canvas = drawThumbnail(pixels, colorPalette);
       link.appendChild(canvas);
 
@@ -88,12 +106,11 @@ body {
       var id = document.createElement("a");
       id.className += " id";
       id.href = "#";
-      var gameId = games[i].id;
+      var gameId = game.id;
       id.gameId = gameId;
       id.onclick = function () {removeGame(this.gameId); return false;}
       id.innerHTML += "delete";
       gallery.appendChild(id);
-    }
   }
 
   function httpGetAsync(theUrl, callback)
