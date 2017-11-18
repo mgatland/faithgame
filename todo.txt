@@ -1,0 +1,10 @@
+[ ] maybe draw links as lines connecting the pages on the left side
+[ ] gallery: "sort by purity" | "sort by date" [x] show apocraphyial games
+[ ] a way to inspect every page in broken games
+[ ] let people page through broken games
+[ ] add proper credits (our names, and increpare properly)
+[ ] if server is down, unlock save button so the user can save a copy locally, or prompt them to try again
+
+[x] make the games load faster, or one-by-one
+[x] better icons for making links, possibly down the right hand side
+[x] fix security issue where users can 'temporarily delete' games without a password

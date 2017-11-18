@@ -35,6 +35,14 @@ app.post('/newgame', function(req, res){
 
 app.post("/remove", function(req, res) {
 	var gameToRemove = req.body.num;
+	var pass = req.body.pass;
+
+	if (process.env.mongopass != pass) {
+  		console.log("attempt to delete with wrong password: \"" + pass + "\"");
+  		res.send("you may not remove from the archive");
+  		return;
+  	}
+
 	res.send('ok');
 	gameSummaries.forEach(function (summary, index) {
 		if (summary.id == req.body.num) {
@@ -43,7 +51,7 @@ app.post("/remove", function(req, res) {
 			console.log("removing game number " + index + " with id " + req.body.num);
 		}
 	});
-	deleteFromDatabase(req.body.num, req.body.pass);
+	deleteFromDatabase(gameToRemove, pass);
 });
 
 app.get("/games", function(req, res){
