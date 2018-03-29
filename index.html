@@ -505,9 +505,9 @@ function press(evt){
           } else {
           }
         }
-        document.getElementById("shareButton").style.display = "";
         if (numPagesWithLinks>2) {
           document.getElementById("linkTip").style.display = "none";
+          document.getElementById("shareButton").style.display = "";
         } else {
           document.getElementById("linkTip").style.display = "";
         }
@@ -1579,7 +1579,7 @@ body {
                             </td>                           
                           </tr>
                         </table>
-                      <div style="display:none" class="importantTip" id="linkTip">the colors on each page can be made to link to another page using the boxes above</div>
+                      <div style="display:none" class="importantTip" id="linkTip">the colors on each page can be linked to other pages using the boxes above</div>
                       <a href="#" onclick="shareClick();return false;" style="display:none" class="button" id="shareButton">&ocir; it is done</a>
                       <br />
                       <div id="shareLink"></div>
