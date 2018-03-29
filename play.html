@@ -189,7 +189,7 @@ function redraw(){
     } else {
       mainCanvas.style.cursor="default";
     }
-    console.log(x+","+y+","+ch);
+    //console.log(x+","+y+","+ch);
 
   }
 
@@ -223,6 +223,19 @@ var gameState;
 function loadState(code){
     gameState=JSON.parse(code);
     colorPalette = gameState.colorPalette;
+
+    //if any page except the last has no outgoing links, we allow the user to progress to the following page despite the author's intentions
+    for(let i = 0; i < gameState.hyperlinks.length - 1; i++) {
+      let links = gameState.hyperlinks[i]
+      let anyLinks = false;
+      for(let j = 0; j < links.length; j++) {
+        if (links[j] != 0) anyLinks = true
+      }
+      if (!anyLinks) {
+        console.log("adding links to page " + i)
+        links.fill(i + 2)
+      }
+    }
 }
 
 function getParameterByName(name) {
