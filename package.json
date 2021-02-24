@@ -12,7 +12,7 @@
   "dependencies": {
     "base64-js": "^1.2.1",
     "body-parser": "^1.14.2",
-    "express": "4.13.4",
-    "mongodb": "^2.1.4"
+    "express": "^4.17.1",
+    "mongodb": "^3.6.4"
   }
 }

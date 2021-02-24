@@ -70,12 +70,12 @@ var mongodb = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
 
 if (process.env.mongouser) {
-var uri = "mongodb://" + process.env.mongouser + ":" + process.env.mongopass + '@' + process.env.mongourl
+var uri = "mongodb+srv://" + process.env.mongouser + ":" + process.env.mongopass + '@' + process.env.mongourl
 
-	mongodb.MongoClient.connect(uri, function(err, newdb) {
+	mongodb.MongoClient.connect(uri, function(err, client) {
 	  if(err) throw err;
 	  console.log("yay we connected to the database");
-	  var database = newdb;
+	  var database = client.db('games');
 	  var dbGames = database.collection('games');
 	  dbGames.find(function (err, cursor) {
 	    cursor.each(function (err, item) {
