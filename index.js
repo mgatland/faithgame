@@ -70,7 +70,7 @@ var mongodb = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
 
 if (process.env.mongouser) {
-var uri = "mongodb://" + process.env.mongouser + ":" + process.env.mongopass + "@ds051665.mongolab.com:51665/faithgame"
+var uri = "mongodb://" + process.env.mongouser + ":" + process.env.mongopass + '@' + process.env.mongourl
 
 	mongodb.MongoClient.connect(uri, function(err, newdb) {
 	  if(err) throw err;
