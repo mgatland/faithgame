@@ -1,4 +1,4 @@
-http://faithgame.herokuapp.com/
+https://faithgame.mgatland.com/
 
 faithgame is a fork of flickgame (http://www.flickgame.org)
 
